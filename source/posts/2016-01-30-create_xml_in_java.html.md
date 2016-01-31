@@ -1,8 +1,15 @@
 ---
-title: Create XML in Java
+title: What is the best way to create XML in Java?
+tagline: A very common capability that many of my Java programs require is the ability to create XML.  There are a couple of ways to do this but, more often that not, the techniques that I have seen suffer from a number of issues. In this note I show the common set of techniques that I have seen and then to offer my opinion on the trade-offs between the different techniques.
+date: 2016-01-30
+release: yes
+keywords:
+  - Java
+  - Performance Comparison
+  - XML
 ---
 
-# Create XML in Java
+# What is the best way to create XML in Java?
 
 A very common capability that many of my Java programs require is the ability to create XML.  There are a couple of ways to do this but, more often that not, the techniques that I have seen suffer from a number of issues:
 
@@ -678,8 +685,9 @@ public class JAXBMarshallPayment implements MarshallPayment {
 Notes:
 
 - The implementation shown above has been replaced with a class called `NaiveSchemaJAXBMarshallPayment`.  The reason for giving this implementation that name is:
-    - At runtime much of the heavy lifting of the marshaller is taken up creating the marshaller as opposed to using the marshaller.  This implementation is then considered naive as a marshaller for `generated.Payment` is created every time an XML instance of `PaymentValue` is required.  The timings below show that this has significant overhead.
-    - Even-though JAXB generates marshalling/unmarshalling code this code does not enforce any schema. To ensure schema validation it is necessary to explicitly associate the schema with the marshaller at runtime.
+	- At runtime much of the heavy lifting of the marshaller is taken up creating the marshaller as opposed to using the marshaller.  This implementation is then considered naive as a marshaller for `generated.Payment` is created every time an XML instance of `PaymentValue` is required.  The timings below show that this has significant overhead.
+	- Even-though JAXB generates marshalling/unmarshalling code this code does not enforce any schema. To ensure schema validation it is necessary to explicitly associate the schema with the marshaller at runtime.
+
 - This implementation has been split into 4 implementations to better understand the impact on performance:
     - **NaiveSchemaJAXBMarshallPayment**: Marshaller is created on each invocation and the generated XML is guaranteed to be compliant with the schema
     - **NaiveSchemalessJAXBMarshallPayment**: Marshaller is created on each invocation but the generated XML is not validated against any schema
@@ -738,9 +746,7 @@ Based on the timings and observations these are my recommendations:
 - For creating XML within a more structured environment where there is a strong TDD discipline, performance is critical I might consider *JAXB efficient without schema enforcement* otherwise I would recommend *JAXB efficient with schema enforcement*.
 - I can think of no circumstances where I would use a templating approach like FreeMarker.
 - I can think of no circumstances to use naive JAXB.
-- Even-though *Native String Builder* is performant, it should only be used in exceptional conditions where performance is an absolute premium.  Even under those circumstances I would be reticent in applying this technique without:
-  - Robust unit tests using generative techniques like [Property-Based Testing](http://www.scalatest.org/user_guide/property_based_testing) to generate data and identify boundary conditions that the development team might overlook, and
-  - Experienced developers who have a deep working understanding of XML and the consequence of special characters.
+- Even-though *Native String Builder* is performant, it should only be used in exceptional conditions where performance is an absolute premium.  Even under those circumstances I would be reticent in applying this technique without a robust set of generative unit tests and experienced developers who have a deep working understanding of XML and the consequence of special characters.
 {: .default-ul }
 
 ## Possible Further Work

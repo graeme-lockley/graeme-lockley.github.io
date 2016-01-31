@@ -1,6 +1,13 @@
 ---
-title: Middleman is Loaded Again
+title: Ideas in Software is Loaded
 ---
 
-<%= image_tag 'mm-logo.png' %>
+<!--
+<ul>
+<% sitemap.resources.select{|n| n.path.start_with?("posts/")}.each do |f| %>
+<li><%= f.path %>: <%= f.metadata %> <%= link_to f.metadata[:page]["title"], f.path %> </li>
+<% end %>
+</ul>
+-->
 
+<%= partial "posts/2016-01-30-create_xml_in_java.html" %>
