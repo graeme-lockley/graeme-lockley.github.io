@@ -1,12 +1,16 @@
 ---
 title: Ideas in Software is Loaded
 ---
-
-<!-- <ul>
-<% sitemap.resources.select{|n| n.path.start_with?("posts/")}.each do |f| %>
-<li><%= f.path %>: <%= f.metadata %> <%= link_to f.metadata[:page]["title"], f.path %> </li>
+<%
+require "date"
+%>
+<% sitemap.resources.select{|n| n.path.start_with?("posts/")}.sort_by{|x| x.metadata[:page]["date"]}.reverse.each do |f| %>
+  <!-- <%= f.path %>: <%= f.metadata %> -->
+  <p style="font-size: 30px"><%= link_to f.metadata[:page]["title"], f.path %></p>
+  <p><%= f.metadata[:page]["tagline"] %></p>
+  <p style="font-weight: bold; font-size: smaller"><%= f.metadata[:page]["date"].strftime("%B %d, %Y") %></p>
+  <hr>
 <% end %>
-</ul> -->
 
 
-<%= partial "posts/20160130-create_xml_in_java.html" %>
+<!-- <%= partial "posts/20160130-create_xml_in_java.html" %> -->
