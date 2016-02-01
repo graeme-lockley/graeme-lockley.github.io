@@ -733,8 +733,8 @@ Native String Builder | 53ms | 1.00
 DSL with String Builder Visitor | 114ms | 2.15
 DSL with DOM Visitor | 718ms | 13.55
 FreeMarker Template | 831ms | 15.68
-JAXB naive without schema enforcement | 58,862msms | 1,110.60
-JAXB naive with schema enforcement | 67,327msms | 1,270.32
+JAXB naive without schema enforcement | 58,862ms | 1,110.60
+JAXB naive with schema enforcement | 67,327ms | 1,270.32
 JAXB efficient without schema enforcement | 115ms | 2.17
 JAXB efficient with schema enforcement | 972ms |  16.45
 

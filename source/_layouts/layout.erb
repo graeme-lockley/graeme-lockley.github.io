@@ -1,16 +1,27 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="description" content="">
+  <meta name="author" content="">
 
-  <!-- Always force latest IE rendering engine or request Chrome Frame -->
-  <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
-  <meta name="viewport" content="width=device-width">
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <!-- Use title if it's in the page YAML frontmatter -->
   <title><%= current_page.data.title || "Ideas in Software is Loaded" %></title>
 
   <%= stylesheet_link_tag "application" %>
+  <!-- <%= stylesheet_link_tag "Skeleton-2.0.4/normalize" %>
+  <%= stylesheet_link_tag "Skeleton-2.0.4/skeleton" %> -->
+
   <%= yield_content :css %>
 </head>
 

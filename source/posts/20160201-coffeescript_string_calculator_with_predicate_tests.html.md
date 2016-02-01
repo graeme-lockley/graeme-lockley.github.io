@@ -1,23 +1,23 @@
 ---
-title: From scratch predicate based testing with CoffeeScript
-tagline: Predicate based testing seems hard especially when looking through the different libraries - the learning curve feels enormous.  This note shows the String Calculator Kata built using predicate based tests without any special framework - all done with a little bit of randomness and some higher-order functions.
+title: From scratch property based testing with CoffeeScript
+tagline: Property based testing seems hard especially when looking through the different libraries - the learning curve feels enormous.  This note shows the String Calculator Kata built using property based tests without any special framework - all done with a little bit of randomness and some higher-order functions.
 date: 2016-02-01
 release: yes
 keywords:
   - CoffeeScript
-  - Predicate Based Testing
+  - Properaty Based Testing
   - Unit Testing
 ---
 
-# Predicate Based Testing with CoffeeScript
+# Property Based Testing with CoffeeScript
 
-Each Thursday a group of us get together to perform the [String Calculator Kata](http://osherove.com/tdd-kata-1).  This started out as an exercise in TDD and finding ways to extract efficiency out of our own development process.  Over time, however, our Thursday ritual evolved into a discovery of new languages and a learning of new techniques.  Having played with Scala I recently performed the kata using [ScalaTest](http://www.scalatest.org) and, more specifically, predicate based tests (PBT).  This turned out to be a fun exercise as it not only resulted in a fewer number of unit tests but I was also able to identify a number of boundary conditions which none of us had noticed with cherry picked test data.
+Each Thursday a group of us get together to perform the [String Calculator Kata](http://osherove.com/tdd-kata-1).  This started out as an exercise in TDD and finding ways to extract efficiency out of our own development process.  Over time, however, our Thursday ritual evolved into a discovery of new languages and a learning of new techniques.  Having played with Scala I recently performed the kata using [ScalaTest](http://www.scalatest.org) and, more specifically, property based tests (PBT).  This turned out to be a fun exercise as it not only resulted in a fewer number of unit tests but I was also able to identify a number of boundary conditions which none of us had noticed with cherry picked test data.
 
 My next attempt at this kata was using CoffeeScript and, more interestingly, I wanted to perform this kata using PBT.  Not having a testing framework like ScalaTest for CoffeeScript I set out to build one as part of the kata only to find that, with higher-order functions, this was a surprisingly simple task. I found that by knocking together tests in this way it was easy to explain to the audience what was happening and it made the exercise significantly more accessible - there was no mystery hidden away within a testing framework like ScalaTest.
 
 ## Background
 
-The examples and code extracts covered here can be found at [github](https://github.com/graeme-lockley/string-calculator-coffeescript-pbt).  The JavaScript libraries used are [Mocha](http://mochajs.org) and [Chai](http://chaijs.com).
+The examples and code extracts covered here can be found at [https://github.com/graeme-lockley/string-calculator-coffeescript-pbt](https://github.com/graeme-lockley/string-calculator-coffeescript-pbt).  The JavaScript libraries used are [Mocha](http://mochajs.org) and [Chai](http://chaijs.com).
 
 ## Generators
 
@@ -193,7 +193,7 @@ For the final test, confirming that negative numbers will result in an exception
 
 ## Conclusion
 
-Oddly enough in my Scala code I don't use ScalaTest for predicate based testing anymore as it adds a layer of indirection which at times leaves me a little confused groping through the source to try and understand what actually went wrong.
+Oddly enough in my Scala code I don't use ScalaTest for property based testing anymore as it adds a layer of indirection which at times leaves me a little confused groping through the source to try and understand what actually went wrong.
 
 As a further exercise I used a similar approach whilst performing the [kata in Java 8](https://github.com/graeme-lockley/string-calculator-java8-pbt).  More recently I was creating some value objects in Java 6 and found myself wanting to generate value objects to validate methods over these objects.  I then completed the [kata](https://github.com/graeme-lockley/string-calculator-java6-pbt) using Java 6 as an exercise to evolve the PBT boilerplate and see what the tests would look like without lambdas and real closures. Like before, I was amazed at the simplicity and readability of the resulting tests.  As I still write loads of Java 6 and Java 7 code I have taken the learnings from the Java 6 kata and dropped them into a library which I've placed on [github](https://github.com/graeme-lockley/pbt-java6) and is accessible through a maven repo.
 
