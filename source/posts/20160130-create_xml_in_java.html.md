@@ -304,7 +304,7 @@ Finally I created an implementation for this interface which assembles a DOM obj
 ~~~ java
 public class DOMVisitor implements XMLVisitor {
     private final Document doc;
-    private Element currentElement = null;
+    private Optional<Element> currentElement = Optional.empty();
     private static DocumentBuilder docBuilder;
     private static Transformer transformer;
 
@@ -326,18 +326,14 @@ public class DOMVisitor implements XMLVisitor {
     }
 
     public void visit(XMLElement xmlElement) {
-        Element previous = currentElement;
+        Optional<Element> previous = currentElement;
         Element newElement = doc.createElement(xmlElement.name());
 
-        if (currentElement == null) {
-            doc.appendChild(newElement);
-        } else {
-            currentElement.appendChild(newElement);
-        }
-        currentElement = newElement;
+        currentElement.map(x -> (Node) x).orElse(doc).appendChild(newElement);
+        currentElement = Optional.of(newElement);
 
         for (XMLAttribute attr : xmlElement.attributes()) {
-            currentElement.setAttribute(attr.name(), attr.value());
+            currentElement.get().setAttribute(attr.name(), attr.value());
         }
 
         for (XMLBody body : xmlElement.bodyElements()) {
@@ -348,21 +344,17 @@ public class DOMVisitor implements XMLVisitor {
     }
 
     public void visit(XMLText xmlText) {
-        if (currentElement == null) {
-            throw new IllegalArgumentException("Unable to attach a text block at the root of an XML document");
-        } else {
-            final Text textNode = doc.createTextNode(xmlText.text());
-            currentElement.appendChild(textNode);
-        }
+        currentElement.orElseThrow(() -> new IllegalArgumentException("Unable to attach a text block at the root of an XML document"));
+
+        final Text textNode = doc.createTextNode(xmlText.text());
+        currentElement.get().appendChild(textNode);
     }
 
     public void visit(XMLBodyLiteral xmlBodyLiteral) {
-        if (currentElement == null) {
-            throw new IllegalArgumentException("Unable to attach a text block at the root of an XML document");
-        } else {
-            final Text textNode = doc.createTextNode(xmlBodyLiteral.xmlString());
-            currentElement.appendChild(textNode);
-        }
+        currentElement.orElseThrow(() -> new IllegalArgumentException("Unable to attach a text block at the root of an XML document"));
+
+        final Text textNode = doc.createTextNode(xmlBodyLiteral.xmlString());
+        currentElement.get().appendChild(textNode);
     }
 
     public String asString() {
