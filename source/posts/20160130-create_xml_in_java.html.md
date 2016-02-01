@@ -207,7 +207,7 @@ public class StringBuilderMarshallPayment implements MarshallPayment {
 ### Timing
 
 Description | Duration | Relative Index All
-------------|----------|-------------------
+------------|---------:|------------------:
 Native String Builder | 53ms | 1.00
 
 The column *Relative Index All* in the above table is carried though across all of the timing tables to show the relative performance of each implementation against this implementation.
@@ -374,7 +374,7 @@ The DOM visitor implementation is straightforward - it stores the root element a
 ### Timing
 
 Description | Duration | Relative Index All
-------------|----------|-------------------
+------------|---------:|------------------:
 DSL with DOM Visitor | 718ms | 13.55
 
 ### Analysis
@@ -439,7 +439,7 @@ public class StringBuilderVisitor implements XMLVisitor {
 ### Timing
 
 Description | Duration | Relative Index All | Relative Index
-------------|----------|------------------------------------
+------------|---------:|-------------------:|--------------:
 DSL with String Builder Visitor | 114ms | 2.15 | 1.00
 DSL with DOM Visitor | 718ms | 13.55 | 6.30
 
@@ -534,7 +534,7 @@ The magic with this technique happens in the template `PaymentTemplate.ftl`.
 ### Timing
 
 Description | Duration | Relative Index All
-------------|----------|-------------------
+------------|---------:|------------------:
 FreeMarker Template | 831ms | 15.68
 
 ### Analysis
@@ -692,7 +692,7 @@ Notes:
 Over 10,000 iterations the following times were observed:
 
 Description | Duration | Relative Index All | Relative Index
-------------|----------|--------------------|---------------
+------------|---------:|-------------------:|--------------:
 JAXB naive without schema enforcement | 58,862ms | 1,110.60 | 512.10
 JAXB naive with schema enforcement | 67,327ms | 1,270.32 | 585.45
 JAXB efficient without schema enforcement | 115ms | 2.17 | 1.00
@@ -720,7 +720,7 @@ Cons:
 The following table shows a comparison of all of the timings against the different techniques.
 
 Description | Duration | Relative Index
-------------|----------|---------------
+------------|---------:|--------------:
 Native String Builder | 53ms | 1.00
 DSL with String Builder Visitor | 114ms | 2.15
 DSL with DOM Visitor | 718ms | 13.55
