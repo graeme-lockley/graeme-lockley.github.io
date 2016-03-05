@@ -1,0 +1,20 @@
+---
+title: All Ideas in Software
+---
+<%
+require "date"
+%>
+<% sitemap.resources.select{|n| n.path.start_with?("posts/")}.sort_by{|x| x.metadata[:page]["date"]}.reverse.each do |f| %>
+  <!-- <%= f.path %>: <%= f.metadata %> -->
+  <% if (f.metadata[:page]["release"]) then %>
+    <p style="font-size: 30px"><%= link_to f.metadata[:page]["title"], f.path %></p>
+  <% else %>
+    <p style="font-size: 30px"><span style="color: red">DRAFT</span> <%= link_to f.metadata[:page]["title"], f.path %></p>
+  <% end %>
+  <p><%= f.metadata[:page]["tagline"] %></p>
+  <p style="font-weight: bold; font-size: smaller"><%= f.metadata[:page]["date"].strftime("%B %d, %Y") %></p>
+  <hr>
+<% end %>
+
+
+<!-- <%= partial "posts/20160130-create_xml_in_java.html" %> -->

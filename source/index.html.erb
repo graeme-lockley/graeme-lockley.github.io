@@ -4,7 +4,7 @@ title: Ideas in Software
 <%
 require "date"
 %>
-<% sitemap.resources.select{|n| n.path.start_with?("posts/")}.sort_by{|x| x.metadata[:page]["date"]}.reverse.each do |f| %>
+<% sitemap.resources.select{|n| n.path.start_with?("posts/") && n.metadata[:page]["release"]}.sort_by{|x| x.metadata[:page]["date"]}.reverse.each do |f| %>
   <!-- <%= f.path %>: <%= f.metadata %> -->
   <p style="font-size: 30px"><%= link_to f.metadata[:page]["title"], f.path %></p>
   <p><%= f.metadata[:page]["tagline"] %></p>
