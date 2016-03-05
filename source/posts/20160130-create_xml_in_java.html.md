@@ -207,7 +207,7 @@ public class StringBuilderMarshallPayment implements MarshallPayment {
 ### Timing
 
 Description | Duration | Relative Index All
-------------|----------|-------------------
+------------|---------:|------------------:
 Native String Builder | 53ms | 1.00
 
 The column *Relative Index All* in the above table is carried though across all of the timing tables to show the relative performance of each implementation against this implementation.
@@ -304,7 +304,7 @@ Finally I created an implementation for this interface which assembles a DOM obj
 ~~~ java
 public class DOMVisitor implements XMLVisitor {
     private final Document doc;
-    private Element currentElement = null;
+    private Optional<Element> currentElement = Optional.empty();
     private static DocumentBuilder docBuilder;
     private static Transformer transformer;
 
@@ -326,18 +326,14 @@ public class DOMVisitor implements XMLVisitor {
     }
 
     public void visit(XMLElement xmlElement) {
-        Element previous = currentElement;
+        Optional<Element> previous = currentElement;
         Element newElement = doc.createElement(xmlElement.name());
 
-        if (currentElement == null) {
-            doc.appendChild(newElement);
-        } else {
-            currentElement.appendChild(newElement);
-        }
-        currentElement = newElement;
+        currentElement.map(x -> (Node) x).orElse(doc).appendChild(newElement);
+        currentElement = Optional.of(newElement);
 
         for (XMLAttribute attr : xmlElement.attributes()) {
-            currentElement.setAttribute(attr.name(), attr.value());
+            currentElement.get().setAttribute(attr.name(), attr.value());
         }
 
         for (XMLBody body : xmlElement.bodyElements()) {
@@ -348,21 +344,17 @@ public class DOMVisitor implements XMLVisitor {
     }
 
     public void visit(XMLText xmlText) {
-        if (currentElement == null) {
-            throw new IllegalArgumentException("Unable to attach a text block at the root of an XML document");
-        } else {
-            final Text textNode = doc.createTextNode(xmlText.text());
-            currentElement.appendChild(textNode);
-        }
+        currentElement.orElseThrow(() -> new IllegalArgumentException("Unable to attach a text block at the root of an XML document"));
+
+        final Text textNode = doc.createTextNode(xmlText.text());
+        currentElement.get().appendChild(textNode);
     }
 
     public void visit(XMLBodyLiteral xmlBodyLiteral) {
-        if (currentElement == null) {
-            throw new IllegalArgumentException("Unable to attach a text block at the root of an XML document");
-        } else {
-            final Text textNode = doc.createTextNode(xmlBodyLiteral.xmlString());
-            currentElement.appendChild(textNode);
-        }
+        currentElement.orElseThrow(() -> new IllegalArgumentException("Unable to attach a text block at the root of an XML document"));
+
+        final Text textNode = doc.createTextNode(xmlBodyLiteral.xmlString());
+        currentElement.get().appendChild(textNode);
     }
 
     public String asString() {
@@ -382,7 +374,7 @@ The DOM visitor implementation is straightforward - it stores the root element a
 ### Timing
 
 Description | Duration | Relative Index All
-------------|----------|-------------------
+------------|---------:|------------------:
 DSL with DOM Visitor | 718ms | 13.55
 
 ### Analysis
@@ -447,7 +439,7 @@ public class StringBuilderVisitor implements XMLVisitor {
 ### Timing
 
 Description | Duration | Relative Index All | Relative Index
-------------|----------|------------------------------------
+------------|---------:|-------------------:|--------------:
 DSL with String Builder Visitor | 114ms | 2.15 | 1.00
 DSL with DOM Visitor | 718ms | 13.55 | 6.30
 
@@ -542,7 +534,7 @@ The magic with this technique happens in the template `PaymentTemplate.ftl`.
 ### Timing
 
 Description | Duration | Relative Index All
-------------|----------|-------------------
+------------|---------:|------------------:
 FreeMarker Template | 831ms | 15.68
 
 ### Analysis
@@ -700,7 +692,7 @@ Notes:
 Over 10,000 iterations the following times were observed:
 
 Description | Duration | Relative Index All | Relative Index
-------------|----------|--------------------|---------------
+------------|---------:|-------------------:|--------------:
 JAXB naive without schema enforcement | 58,862ms | 1,110.60 | 512.10
 JAXB naive with schema enforcement | 67,327ms | 1,270.32 | 585.45
 JAXB efficient without schema enforcement | 115ms | 2.17 | 1.00
@@ -728,7 +720,7 @@ Cons:
 The following table shows a comparison of all of the timings against the different techniques.
 
 Description | Duration | Relative Index
-------------|----------|---------------
+------------|---------:|--------------:
 Native String Builder | 53ms | 1.00
 DSL with String Builder Visitor | 114ms | 2.15
 DSL with DOM Visitor | 718ms | 13.55
