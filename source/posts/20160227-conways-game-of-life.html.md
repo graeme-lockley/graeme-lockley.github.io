@@ -133,7 +133,7 @@ The structure of the algorithm describes a transition at a cell level and, speci
 class Tick implements Function<Grid, Grid> {
   @Override
   public Grid apply(Grid generation) {
-    return generation.forEach(c -> tickCell(generation, c));
+    return generation.mapCells(c -> tickCell(generation, c));
   }
 
   private CellState tickCell(Grid generation, Coordinate coordinate) {
@@ -144,16 +144,16 @@ class Tick implements Function<Grid, Grid> {
 }
 ~~~
 
-In order to implement this change `Grid` needs to be enhanced with the method `forEach`.
+In order to implement this change `Grid` needs to be enhanced with the method `mapCells`.
 
 ~~~ java
 public interface Grid {
-  Grid forEach(Function<Coordinate, CellState> cellMap);
+  Grid mapCells(Function<Coordinate, CellState> cellMap);
   CellState at(Coordinate coordinate);
 }
 ~~~
 
-There is of course a small technical concern with implementing `forEach` in that `Grid` represents an *infinite* grid.  I'll return to this concern a little later - for now though let's focus on transcribing GOL and, specifically, the last piece of the algorithm which is contained within `tickCell`.
+There is of course a small technical concern with implementing `mapCells` in that `Grid` represents an *infinite* grid.  I'll return to this concern a little later - for now though let's focus on transcribing GOL and, specifically, the last piece of the algorithm which is contained within `tickCell`.
 
 Returning to the heart of the algorithm there are four scenarios which can be treated separately.
 
@@ -166,7 +166,7 @@ Folding this into `Tick` we then get
 class Tick implements Function<Grid, Grid> {
   @Override
   public Grid apply(Grid generation) {
-    return generation.forEach(c -> tickCell(generation, c));
+    return generation.mapCells(c -> tickCell(generation, c));
   }
 
   private CellState tickCell(Grid generation, Coordinate coordinate) {
@@ -189,7 +189,7 @@ class Tick implements Function<Grid, Grid> {
 class Tick implements Function<Grid, Grid> {
   @Override
   public Grid apply(Grid generation) {
-    return generation.forEach(c -> tickCell(generation, c));
+    return generation.mapCells(c -> tickCell(generation, c));
   }
 
   private CellState tickCell(Grid generation, Coordinate coordinate) {
@@ -214,7 +214,7 @@ class Tick implements Function<Grid, Grid> {
 class Tick implements Function<Grid, Grid> {
   @Override
   public Grid apply(Grid generation) {
-    return generation.forEach(c -> tickCell(generation, c));
+    return generation.mapCells(c -> tickCell(generation, c));
   }
 
   private CellState tickCell(Grid generation, Coordinate coordinate) {
@@ -242,7 +242,7 @@ class Tick implements Function<Grid, Grid> {
 class Tick implements Function<Grid, Grid> {
   @Override
   public Grid apply(Grid generation) {
-    return generation.forEach(c -> tickCell(generation, c));
+    return generation.mapCells(c -> tickCell(generation, c));
   }
 
   private CellState tickCell(Grid generation, Coordinate coordinate) {
@@ -278,15 +278,15 @@ public interface Grid {
 }
 ~~~
 
-Before finishing off transcribing the algorithm I need to return to `Grid.forEach`.  In a pure sense we are stuck - the algorithm describes a transformation from one `Grid` to a second `Grid`.  However, looking at the details of the algorithm, it is clear that any `DEAD` cell that is surrounded by only `DEAD` cells will remain `DEAD` in the next generation.  Therefore the only cells that participate in this algorithm are those cells that have at least a single `ALIVE` neighbour.  So if the `seed` has a finite number of `ALIVE` cells we can conclude that the participating cells is a finite number.
+Before finishing off transcribing the algorithm I need to return to `Grid.mapCells`.  In a pure sense we are stuck - the algorithm describes a transformation from one `Grid` to a second `Grid`.  However, looking at the details of the algorithm, it is clear that any `DEAD` cell that is surrounded by only `DEAD` cells will remain `DEAD` in the next generation.  Therefore the only cells that participate in this algorithm are those cells that have at least a single `ALIVE` neighbour.  So if the `seed` has a finite number of `ALIVE` cells we can conclude that the participating cells is a finite number.
 
-In order to progress I am going to introduce the method `Grid.forEachRelevantCell` which iterates over all those cells that have at least a single `ALIVE` neighbour.  `Tick` trivially changes to
+In order to progress I am going to introduce the method `Grid.mapParticipatingCells` which iterates over all those cells that have at least a single `ALIVE` neighbour.  `Tick` trivially changes to
 
 ~~~ java
 class Tick implements Function<Grid, Grid> {
   @Override
   public Grid apply(Grid generation) {
-    return generation.forEachRelevantCell(c -> tickCell(generation, c));
+    return generation.mapParticipatingCells(c -> tickCell(generation, c));
   }
 
   private CellState tickCell(Grid generation, Coordinate coordinate) {
@@ -312,12 +312,12 @@ class Tick implements Function<Grid, Grid> {
 }
 ~~~
 
-whilst `Grid` drops `forEach` with the replacement `forEachRelevantCell`.
+whilst `Grid` drops `mapCells` with the replacement `mapParticipatingCells`.
 
 ~~~ java
 public interface Grid {
   int numberOfAliveNeighbours(Coordinate coordinate);
-  Grid forEachRelevantCell(Function<Coordinate, CellState> cellMap);
+  Grid mapParticipatingCells(Function<Coordinate, CellState> cellMap);
   CellState at(Coordinate coordinate);
 }
 ~~~
@@ -338,7 +338,7 @@ Finally, having come to the end of this implementation, I found no need to refac
 
 - The standard library would have leaked into `Tick` and materially damaged the readability of that class,
 - It would have become necessary to commit to an implementation of `Grid` - as it stands the source contains two implementations which can be swopped out with a third depending on the need, and
-- The algorithm is the algorithm.  To make this implementation time efficient I have no doubt that much progress can be made by building an optimised version of `Grid` and, specifically, the method `forEachRelevantCell`.  By collapsing `Grid` into a standard library implementation this opportunity would have been lost.
+- The algorithm is the algorithm.  To make this implementation time efficient I have no doubt that much progress can be made by building an optimised version of `Grid` and, specifically, the method `mapParticipatingCells`.  By collapsing `Grid` into a standard library implementation this opportunity would have been lost.
 {: .default-ul }
 
 ## Conclusion
