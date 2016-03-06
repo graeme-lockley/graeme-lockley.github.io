@@ -17,8 +17,8 @@ Having been on a number of code retreats I started to become uneasy with the dis
 The intent of this note is to take a different approach:
 
 - Transcribe the algorithm in Java 8,
-- Use interfaces to indicate describe on ancillary behavior, and
-- Use TDD to build the ancillary behavior
+- Use interfaces to highlight and describe ancillary behavior that is implied by but external to the algorithm, and
+- Use TDD to build this ancillary behavior
 {: .default-ul }
 
 A further desire was to use the vocabulary of the problem statement/algorithm at all times.  Doing this has the following benefits:
@@ -29,7 +29,7 @@ A further desire was to use the vocabulary of the problem statement/algorithm at
 
 ## Conway's Game of Life
 
-The problem statement that I am using as the base for this solution is from [Wikipedia](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life):
+The problem statement and algorithm that I am using as the base for this solution is from [Wikipedia](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life):
 
 > The universe of the Game of Life is an infinite two-dimensional orthogonal grid of square cells, each of which is in one of two possible states, alive or dead. Every cell interacts with its eight neighbours, which are the cells that are horizontally, vertically, or diagonally adjacent. At each step in time, the following transitions occur:
 >
@@ -46,7 +46,7 @@ The problem statement that I am using as the base for this solution is from [Wik
 Before we get started some comments:
 
 - I am going to use a [literate style](https://en.wikipedia.org/wiki/Literate_programming) of
-- Source is in github
+- Source is in [github](https://github.com/graeme-lockley/conways-game-of-life-java8)
 {: .default-ul }
 
 # Solution

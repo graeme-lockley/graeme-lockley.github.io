@@ -1,6 +1,6 @@
 ---
 title: Value objects and Java
-tagline: I understand the theory and thinking behind value objects but always felt that the problems I worked with didn't their benefits.  In a number of recent projects I have started to use them and have found them to be delightful - they solve so many problems that I never realised where actual problems.  This note describes how I structure my value objects in Java.
+tagline: I understand the theory and thinking behind value objects but always felt that the problems I worked with didn't need their benefits.  In a number of recent projects I have started to use them and have found them to be delightful - they solve so many problems that I never realised where actual problems.  This note describes how I structure my value objects in Java.
 date: 2016-02-27
 release: yes
 keywords:
