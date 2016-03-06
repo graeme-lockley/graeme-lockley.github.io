@@ -1,7 +1,7 @@
 ---
 title: Transcribing rather than Writing Conway's Game of Life
 tagline: I consistently see folk writing code from the ground up using TDD techniques without considering the DRY principle.  Conway's Game of Life (GOL) is a good example of this where the the problem statement contains semantic facts which can simply be transcribed into code rather than developed in code.  This note demonstrates how much of GOL can be written without much effort.
-date: 2016-03-01
+date: 2016-03-06
 release: yes
 keywords:
   - Java
