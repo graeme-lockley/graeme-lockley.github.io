@@ -157,7 +157,7 @@ There is of course a small technical concern with implementing `forEach` in that
 
 Returning to the heart of the algorithm there are four scenarios which can be treated separately.
 
-> - Any live cell with fewer than two live neighbours dies, as if caused by under-population.
+> - Any <span style="background-color: yellow">live cell with fewer than two live neighbours dies</span>, as if caused by under-population.
 > {: .default-ul }
 
 Folding this into `Tick` we then get
@@ -182,7 +182,7 @@ class Tick implements Function<Grid, Grid> {
 }
 ~~~
 
-> - Any live cell with two or three live neighbours lives on to the next generation.
+> - Any <span style="background-color: yellow">live cell with two or three live neighbours lives</span> on to the next generation.
 > {: .default-ul }
 
 ~~~ java
@@ -207,7 +207,7 @@ class Tick implements Function<Grid, Grid> {
 }
 ~~~
 
-> - Any live cell with more than three live neighbours dies, as if by over-population.
+> - Any <span style="background-color: yellow">live cell with more than three live neighbours dies</span>, as if by over-population.
 > {: .default-ul }
 
 ~~~ java
@@ -235,7 +235,7 @@ class Tick implements Function<Grid, Grid> {
 }
 ~~~
 
-> - Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+> - Any <span style="background-color: yellow">dead cell with exactly three live neighbours becomes a live cell</span>, as if by reproduction.
 > {: .default-ul }
 
 ~~~ java
