@@ -2,7 +2,7 @@
 title: Transcribing rather than Writing Conway's Game of Life
 tagline: I consistently see folk writing code from the ground up using TDD techniques without considering the DRY principle.  Conway's Game of Life (GOL) is a good example of this where the the problem statement contains semantic facts which can simply be transcribed into code rather than developed in code.  This note demonstrates how much of GOL can be written without much effort.
 date: 2016-03-01
-release: no
+release: yes
 keywords:
   - Java
   - Game of Life
@@ -12,7 +12,7 @@ keywords:
 
 Conway's Game of Life (GOL) is a problem that is often used in code retreats as it is sufficiently challenging to provoke wonderful discussion and debate, and sufficiently complex that it cannot reasonably be completed within the timeframe.
 
-Having been on a number of code retreats I started to become uneasy with the discussions because the style of the code retreat was always centered around Test Driven Development (TDD) practice.  Having drunk from both the TDD and DRY Kool-Aid fountain my uneasiness was centered around the realisation that the GOL problem statement is actually an algorithm and, rather than exploiting the algorithm as a semantic fact, much of my effort was in building tests from the ground up and assembling the solution through composition.
+Having been on a number of code retreats I started to become uneasy with the discussions because the style of the code retreat was always centered around Test Driven Development (TDD) practice.  Having drunk from both the TDD and DRY Kool-Aid fountain my uneasiness was centered around the realisation that the GOL problem statement is actually an algorithm and, rather than exploiting the algorithm as a semantic fact, much of the effort was in building tests from the ground up and assembling the solution through composition.
 
 The intent of this note is to take a different approach:
 
@@ -153,7 +153,7 @@ public interface Grid {
 }
 ~~~
 
-There is of course a small technical concern with implementing `forEach` in that `Grid` represents an *infinite* grid.  I'll return to this concern a little later - for now thought let's focus on transcribing GOL and, specifically, the last piece of the algorithm which is contained within `tickCell`.
+There is of course a small technical concern with implementing `forEach` in that `Grid` represents an *infinite* grid.  I'll return to this concern a little later - for now though let's focus on transcribing GOL and, specifically, the last piece of the algorithm which is contained within `tickCell`.
 
 Returning to the heart of the algorithm there are four scenarios which can be treated separately.
 
@@ -268,7 +268,7 @@ class Tick implements Function<Grid, Grid> {
 }
 ~~~
 
-In applying these rules we have added a further method into the interface of `Grid`.
+In applying these rules we have needed to add the method `numberOfAliveNeighbours` into the interface of `Grid`.
 
 ~~~ java
 public interface Grid {
@@ -278,7 +278,7 @@ public interface Grid {
 }
 ~~~
 
-Before finishing off transcribing the algorithm I need to return to `Grid.forEach`.  In a pure sense we are stuck - the algorithm describe a transformation from one `Grid` to a second `Grid`.  However, looking at the details of the algorithm, it is clear that any `DEAD` cell that is surrounded by only `DEAD` cells will remain `DEAD` in the next generation.  Therefore the only cells that participate in this algorithm are those cells that have at least a single `ALIVE` neighbour.  So if the `seed` has a finite number of `ALIVE` cells we can conclude that the participating cells is a finite number.
+Before finishing off transcribing the algorithm I need to return to `Grid.forEach`.  In a pure sense we are stuck - the algorithm describes a transformation from one `Grid` to a second `Grid`.  However, looking at the details of the algorithm, it is clear that any `DEAD` cell that is surrounded by only `DEAD` cells will remain `DEAD` in the next generation.  Therefore the only cells that participate in this algorithm are those cells that have at least a single `ALIVE` neighbour.  So if the `seed` has a finite number of `ALIVE` cells we can conclude that the participating cells is a finite number.
 
 In order to progress I am going to introduce the method `Grid.forEachRelevantCell` which iterates over all those cells that have at least a single `ALIVE` neighbour.  `Tick` trivially changes to
 
@@ -322,9 +322,9 @@ public interface Grid {
 }
 ~~~
 
-## Conclusion
+## Closing
 
-What started out as a TDD problem to implement GOL has turned into a much simpler problem - implement the three methods contained within `Grid`.  The remainder of the GOL solution is nothing more than an exercise in transcribing the algorithm from English into Java 8.
+What started out as a TDD exercise to implement GOL has turned into a much simpler problem - implement the three methods contained within `Grid`.  The remainder of the GOL solution is nothing more than an exercise in transcribing the algorithm from English into Java 8.
 
 I will not show how to TDD `Grid` as this is a relatively simple exercise.  The code that accompanies this note has two implementations - one a set based implementation and the second a linked list styled implementation.  Interestingly both of these implementations have the following characteristics:
 
@@ -332,11 +332,15 @@ I will not show how to TDD `Grid` as this is a relatively simple exercise.  The 
 - Instances of `Grid` are composed using a builder.
 {: .default-ul }
 
-I found this interesting because my instinctive implementation was to make `Grid` implementations mutable.
+I found this interesting because all of my previous pure TDD GOL implementations made the `Grid` abstraction mutable.
 
-Finally, having come to the end of this implementation, I found no need to refactor `Grid` away and replace it with a standard Java library.  Factually doing so would have had some severe consequences:
+Finally, having come to the end of this implementation, I found no need to refactor `Grid` away and replace it with a standard Java library.  Doing so would have had some severe consequences:
 
 - The standard library would have leaked into `Tick` and materially damaged the readability of that class,
-- It would have necessary to commit to an implementation of `Grid` - as it stands the source contains two implementations which can be swopped out with a third depending on the need, and
+- It would have become necessary to commit to an implementation of `Grid` - as it stands the source contains two implementations which can be swopped out with a third depending on the need, and
 - The algorithm is the algorithm.  To make this implementation time efficient I have no doubt that much progress can be made by building an optimised version of `Grid` and, specifically, the method `forEachRelevantCell`.  By collapsing `Grid` into a standard library implementation this opportunity would have been lost.
 {: .default-ul }
+
+## Conclusion
+
+This exercise has reminded me that much of what we as developers do is to translate a requirement into a software implementation that fulfills that requirement.  Too often though we start from the ground up thinking that we have nothing to start with.  Holding the DRY principle close and being open to where semantic facts are recorded could greatly simplify our day-to-day and increase the quality of our software by reducing cognitive dissonance when stepping between human representations and software representations.
