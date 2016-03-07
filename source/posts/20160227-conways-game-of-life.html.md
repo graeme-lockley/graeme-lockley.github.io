@@ -319,6 +319,43 @@ Finally, having come to the end of this implementation, I found no need to refac
 - The algorithm is the algorithm.  To make this implementation time efficient I have no doubt that much progress can be made by building an optimised version of `Grid` and, specifically, the method `mapParticipatingCells`.  By collapsing `Grid` into a standard library implementation this opportunity would have been lost.
 {: .default-ul }
 
+## Some Scala?
+
+Out of curiosity I went through the same process and wrote a Scala version of the above code.  This is what it looked like.
+
+~~~ scala
+package gol
+
+trait CellState
+
+case object ALIVE extends CellState
+case object DEAD extends CellState
+
+case class Coordinate(x: Int, y: Int)
+
+trait Grid {
+  def numberOfLiveNeighbours(c: Coordinate): Int
+  def map(f: Coordinate => CellState): Grid
+  def at(coordinate: Coordinate): CellState
+}
+
+package object gol {
+  def tick(generation: Grid): Grid =
+    generation.mapParticipating(c => {
+      val numberOfAliveNeighbors = generation.numberOfLiveNeighbours(c)
+      generation.at(c) match {
+        case ALIVE =>
+          if (numberOfAliveNeighbors < 2) DEAD
+          else if (numberOfAliveNeighbors == 2 || numberOfAliveNeighbors == 3) ALIVE
+          else DEAD
+        case DEAD =>
+          if (numberOfAliveNeighbors == 3) ALIVE
+          else DEAD
+      }
+    })
+}
+~~~
+
 ## Conclusion
 
 This exercise has reminded me that much of what we as developers do is to translate a requirement into a software implementation that fulfills that requirement.  Too often though we start from the ground up thinking that we have nothing to start with.  Holding the DRY principle close and being open to where semantic facts are recorded could greatly simplify our day-to-day and increase the quality of our software by reducing cognitive dissonance when stepping between human representations and software representations.
