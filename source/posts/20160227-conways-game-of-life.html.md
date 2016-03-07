@@ -335,7 +335,7 @@ case class Coordinate(x: Int, y: Int)
 
 trait Grid {
   def numberOfLiveNeighbours(c: Coordinate): Int
-  def map(f: Coordinate => CellState): Grid
+  def mapParticipating(f: Coordinate => CellState): Grid
   def at(coordinate: Coordinate): CellState
 }
 
