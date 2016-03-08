@@ -263,7 +263,7 @@ public interface Grid {
 }
 ~~~
 
-Before finishing off transcribing the algorithm I need to return to `Grid.mapCells`.  In a pure sense we are stuck - the algorithm describes a transformation from one `Grid` to a second `Grid`.  However, looking at the details of the algorithm, it is clear that any `DEAD` cell that is surrounded by only `DEAD` cells will remain `DEAD` in the next generation.  Therefore the only cells that participate in this algorithm are those cells that have at least a single `ALIVE` neighbour.  So if the `seed` has a finite number of `ALIVE` cells we can conclude that the participating cells is a finite number.
+Before finishing off transcribing the algorithm I need to return to `Grid.mapCells`.  In a pure sense we are stuck - the algorithm describes a transformation from one infinite `Grid` to a second infinite `Grid`.  However, looking at the details of the algorithm, it is clear that any `DEAD` cell that is surrounded by only `DEAD` cells will remain `DEAD` in the next generation.  Therefore the only cells that participate in this algorithm are those cells that have at least a single `ALIVE` neighbour.  So if the `seed` has a finite number of `ALIVE` cells we can conclude that the participating cells is a finite number.
 
 In order to progress I am going to introduce the method `Grid.mapParticipatingCells` which iterates over all those cells that have at least a single `ALIVE` neighbour.  `Tick` trivially changes to
 
@@ -358,4 +358,4 @@ package object gol {
 
 ## Conclusion
 
-This exercise has reminded me that much of what we as developers do is to translate a requirement into a software implementation that fulfills that requirement.  Too often though we start from the ground up thinking that we have nothing to start with.  Holding the DRY principle close and being open to where semantic facts are recorded could greatly simplify our day-to-day and increase the quality of our software by reducing cognitive dissonance when stepping between human representations and software representations.
+This exercise has reminded me that much of what we as developers do is to translate a requirement into a software implementation that fulfills that requirement.  Too often though we start from the ground up thinking that we have nothing to start with.  Holding the DRY principle close and being open to where semantic facts are recorded can greatly simplify our day-to-day and increase the quality of our software by reducing cognitive dissonance when stepping between human representations and software representations.
