@@ -1,6 +1,6 @@
 ---
 title: Own your software principles
-tagline: All too easily I find developers get involved in passionate design discussions debating the relative merits of different alternatives - arguments seem to be plucked from the air rather than being grounded by a set of common principles.  This note challenges developers to think about what principles they care about and to share that with their team members.
+tagline: All too easily I find developers get involved in passionate design discussions debating the relative merits of different alternatives - arguments seem to be plucked from the air rather than being grounded in a set of common principles.  This note challenges developers to think about what principles they care about and to share that with their team members.
 date: 2016-03-30
 release: no
 keywords:
