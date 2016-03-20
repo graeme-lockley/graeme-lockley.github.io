@@ -33,6 +33,10 @@
     ga('create', 'UA-74997490-1', 'auto');
     ga('send', 'pageview');
   </script>
+
+  <script type="text/javascript">var switchTo5x=true;</script>
+  <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
+  <script type="text/javascript">stLight.options({publisher: "f3604a1a-d559-4444-87bc-d23e29a24bb1", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
 </head>
 
 <body class="<%= page_classes %>">
@@ -42,11 +46,21 @@
 
   <main class="site-main">
     <div class="container module">
-      <%= yield %>
+      <div class="row">
+        <div class="twelve columns">
+          <%= yield %>
 
-      <% if (current_page.path.start_with?("posts/")) then %>
-        <!-- <%= current_page %> -->
-      <% end %>
+          <% if (current_page.path.start_with?("posts/")) then %>
+            <!-- <%= current_page %> -->
+            <hr>
+            <span class='st_sharethis_large' displayText='ShareThis'></span>
+            <span class='st_facebook_large' displayText='Facebook'></span>
+            <span class='st_twitter_large' displayText='Tweet'></span>
+            <span class='st_linkedin_large' displayText='LinkedIn'></span>
+            <span class='st_email_large' displayText='Email'></span>
+          <% end %>
+        </div>
+      </div>
     </div>
   </main>
 
