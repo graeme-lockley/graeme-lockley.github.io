@@ -36,7 +36,7 @@ Incidentally the requirement that I care about in the above paragraph is what a 
 
 ## Principles That I Care About
 
-How many of us believe strongly in a set of unwritten principles which we will defend with passion and righteousness.  To climb out of this trap I would like to write down my set of software development principles so that:
+How many of us believe strongly in a set of unwritten principles which we will defend with passion and righteousness.  To escape this trap I would like to write down my set of software development principles so that:
 
 * I know what I care about and can show others,
 * I know how I care about what I care about and can show others,
@@ -48,11 +48,11 @@ I am under no illusion that this list and the evolution of this list will be a l
 
 # Some Open Questions
 
-The following are a set of open questions which I will need to answer as I progress along this life journey:
+The following are a set of open questions which I will need to answer as I progress along this journey:
 
 * What is the relationship between [Values, Principles and Practices](http://brodzinski.com/2014/08/practices-principles-values.html)?  How does this influence the whole?
 * Are all principles of the some ilk?  Superficially I feel that principles are of different ilk - developer workflow principles are different to software principles are different to agile team principles are different to workplace principles.  So then what principles am I interested in listing.
 * How does one document a principle?  Does one use an architectural style or a narrative style?
 * Other than me - who will actually read this list? Knowing my audience is important as it directs the level of detail, style and examples.
-* Talking about a principle and the different ways of applying a principle is itself a weighty subject - how deep do a go and when is enough enough?
+* Talking about a principle and the different ways of applying a principle is itself a weighty subject - how deep do I go and when is enough enough?
 {: .default-ul }

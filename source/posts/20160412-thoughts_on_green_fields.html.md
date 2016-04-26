@@ -22,7 +22,7 @@ Roughly speaking this was my approach:
 - I then hit a wall - my final use-cases was to update three entities simultaneously and I discovered that, if my behavior was properly dispersed into the entity classes that I needed a new concept - a transaction - a database transaction.  All of my neat abstractions and simple ```Repository``` fell on the floor.  The only way to introduce immediate consistency was to float a transaction into the business domain.  I could fudge the transaction by introducing a business concept called a unit of work or something else equally artificial to describe immediate consistency but, factually, this concept did not exist in the business domain that I was working with.
 {: .default-ul }
 
-It was at this point that I faced with a question that we often encounter - do I force the code to fit into my architecture and accompanying patterns or do I rethink.  In this case I stopped and rearchitected the entire domain replacing the ```Repository``` with an event based solution.
+It was at this point that I was faced with a question that we often encounter - do I force the code to fit into my architecture and accompanying patterns or do I rethink.  In this case I stopped and rearchitected the entire domain replacing the ```Repository``` with an event based solution.
 
 This experience got me thinking about Brown Fields projects where the architecture and patterns are typically repeated versus the promise of Green Fields where the architecture and patterns can be selected.
 
