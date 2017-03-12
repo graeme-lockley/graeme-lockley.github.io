@@ -1,0 +1,1 @@
+function mix(i,n){i=i||{};for(var f in i)n[f]=i[f]}

@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script>
+  var host = "graeme-lockley.github.io"
+  if (window.location.host == host && window.location.protocol != "https:") {
+    window.location.protocol = "https:"
+  }
+  </script>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <meta name="author" content="graemel@no9.co.za">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- Use title if it's in the page YAML frontmatter -->
+  <title>Transcribing rather than Writing Conway's Game of Life</title>
+
+  <link href="/assets/stylesheets/application-5f1b61a5.css" media="screen" rel="stylesheet" type="text/css" />
+  <!-- <link href="/assets/stylesheets/Skeleton-2.0.4/normalize-510da396.css" media="screen" rel="stylesheet" type="text/css" />
+  <link href="/assets/stylesheets/Skeleton-2.0.4/skeleton-9b4967f6.css" media="screen" rel="stylesheet" type="text/css" /> -->
+
+  
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-74997490-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+</head>
+
+<body class="posts posts_20160227-conways-game-of-life posts_20160227-conways-game-of-life_index">
+  <div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
+
+  <header class="site-header">
+    <nav class="site-nav container" role="navigation">
+  <a class="navbar-brand" href="/">
+    Ideas in Software
+  </a>
+
+<!--
+  <ul class="nav-links">
+    <li><a href="/">home</a>
+      <ul></ul>
+    </li>
+    <li><i class="fa fa-angle-double-right"></i><a href="/docs/">docs</a>
+      <ul>
+        <li><a href="/docs/bitters">bitters</a></li>
+        <li><a href="/docs/markdown">markdown</a></li>
+      </ul>
+    </li>
+    <li><i class="fa fa-angle-double-right"></i><a href="https://github.com/dnajd/rails-loaded">github</a>
+      <ul>
+        <li><a href="https://github.com/dnajd/rails-loaded">rails</a></li>
+        <li><a href="https://github.com/dnajd/middleman-loaded">middleman</a></li>
+        <li><a href="https://github.com/dnajd/ruby_tester">ruby tester</a></li>
+        <li><a href="https://github.com/dnajd/load_runner">load runner</a></li>
+      </ul>
+    </li>
+  </ul>
+-->
+
+  <!-- <div class="mobile-menu"><i class="fa fa-navicon"></i></div> -->
+</nav>
+
+  </header>
+
+  <main class="site-main">
+    <div class="container module">
+      <div class="row">
+        <div class="twelve columns">
+          <h1 id="transcribing-conways-game-of-life">Transcribing Conway's Game of Life</h1>
+
+<p>Conway's Game of Life (GOL) is a problem that is often used in code retreats as it is sufficiently challenging to provoke wonderful discussion and debate, and sufficiently complex that it cannot reasonably be completed within the timeframe.</p>
+
+<p>Having been on a number of code retreats I started to become uneasy with the discussions because the style of the code retreat was always centered around Test Driven Development (TDD) practice.  Having drunk from both the TDD and DRY Kool-Aid fountain my uneasiness was centered around the realisation that the GOL problem statement is actually an algorithm and, rather than exploiting the algorithm as a semantic fact, much of the effort was in building tests from the ground up and assembling the solution through composition.</p>
+
+<p>The intent of this note is to take a different approach:</p>
+
+<ul class="default-ul">
+  <li>Transcribe the algorithm in Java 8,</li>
+  <li>Use interfaces to highlight and describe ancillary behavior that is implied by but external to the algorithm, and</li>
+  <li>Use TDD to build this ancillary behavior</li>
+</ul>
+
+<p>A further desire was to use the vocabulary of the problem statement/algorithm at all times.  Doing this has the following benefits:</p>
+
+<ul class="default-ul">
+  <li>It makes the code readable to non-technical folk, and</li>
+  <li>Reduces cognitive dissonance between the problem space and the solution space</li>
+</ul>
+
+<h2 id="conways-game-of-life">Conway's Game of Life</h2>
+
+<p>The problem statement and algorithm that I am using as the base for this solution is from <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">Wikipedia</a>:</p>
+
+<blockquote>
+  <p>The universe of the Game of Life is an infinite two-dimensional orthogonal grid of square cells, each of which is in one of two possible states, alive or dead. Every cell interacts with its eight neighbours, which are the cells that are horizontally, vertically, or diagonally adjacent. At each step in time, the following transitions occur:</p>
+
+  <ul class="default-ul">
+    <li>Any live cell with fewer than two live neighbours dies, as if caused by under-population.</li>
+    <li>Any live cell with two or three live neighbours lives on to the next generation.</li>
+    <li>Any live cell with more than three live neighbours dies, as if by over-population.</li>
+    <li>Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.</li>
+  </ul>
+
+  <p>The initial pattern constitutes the seed of the system. The first generation is created by applying the above rules simultaneously to every cell in the seed—births and deaths occur simultaneously, and the discrete moment at which this happens is sometimes called a tick (in other words, each generation is a pure function of the preceding one). The rules continue to be applied repeatedly to create further generations.</p>
+</blockquote>
+
+<h2 id="comments">Comments</h2>
+
+<p>Before we get started some comments:</p>
+
+<ul class="default-ul">
+  <li>I am going to use a <a href="https://en.wikipedia.org/wiki/Literate_programming">literate style</a> of coding and attempt to show the code derivation in a way that allows the reader the follow my thinking, and</li>
+  <li>All of the source is in <a href="https://github.com/graeme-lockley/conways-game-of-life-java8">github</a></li>
+</ul>
+
+<h1 id="solution">Solution</h1>
+
+<blockquote>
+  <p>The universe of the Game of Life is an <span style="background-color: yellow">infinite two-dimensional orthogonal grid</span> of square cells, each of which is in one of two possible states, alive or dead.</p>
+</blockquote>
+
+<p>From this GOL is played over a grid. Rather than attempting to use one of the standard Java collections and inheriting the abstraction that accompanies a specific collection type, I would rather start with an empty interface <code>Grid</code> and then populate it with methods based on usage.  At some point I can reassess and refactor this interface into a native collection but, for now, I would rather not force the abstraction.</p>
+
+<pre class="highlight java"><code><span class="kd">interface</span> <span class="nc">Grid</span> <span class="o">{</span>
+<span class="o">}</span>
+</code></pre>
+
+<blockquote>
+  <p>The universe of the Game of Life is an infinite two-dimensional orthogonal grid of square cells, each of which is in one of <span style="background-color: yellow">two possible states, alive or dead</span>.</p>
+</blockquote>
+
+<p>It follows that we require an enum called <code>CellState</code> which has the two elements <code>ALIVE</code> and <code>DEAD</code>.</p>
+
+<pre class="highlight java"><code><span class="kd">enum</span> <span class="n">CellState</span> <span class="o">{</span>
+  <span class="n">ALIVE</span><span class="o">,</span> <span class="n">DEAD</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre>
+
+<blockquote>
+  <p>The universe of the Game of Life is an infinite <span style="background-color: yellow">two-dimensional</span> orthogonal grid of square cells, <span style="background-color: yellow">each of which</span> is in one of two possible states, alive or dead.</p>
+</blockquote>
+
+<p>It further follows that I will need to be able get the state of a cell at a particular coordinate.  To this end introduce a coordinate structure value object.</p>
+
+<pre class="highlight java"><code><span class="kd">class</span> <span class="nc">Coordinate</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">final</span> <span class="n">BigInteger</span> <span class="n">x</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="kd">final</span> <span class="n">BigInteger</span> <span class="n">y</span><span class="o">;</span>
+
+  <span class="kd">public</span> <span class="n">Coordinate</span><span class="o">(</span><span class="n">BigInteger</span> <span class="n">x</span><span class="o">,</span> <span class="n">BigInteger</span> <span class="n">y</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<p>A couple of notes on this class and its implementation:</p>
+
+<ul class="default-ul">
+  <li>This class creates value objects in that, once an instance is created, it can not be mutated and the field values themselves can not be mutated,</li>
+  <li>I have made the elements of <code>Coordinate</code> to be <code>java.math.BigInteger</code> which is aligned with an <em>infinite</em> grid, and</li>
+  <li>Some of you might be anxious that I have exposed the underlying state of <code>Coordinate</code> rather than creating a couple of getter methods.  Quite recently I have become comfortable with this style with the knowledge that, should I need to change the internal representation it would be simple to lean on the compiler and make these two fields private, add the getter methods and then fix all of the compilation errors.</li>
+</ul>
+
+<p>The <code>Grid</code> interface is expanded to include a method to inspect the <code>CellState</code> at a specific <code>Coordinate</code>.</p>
+
+<pre class="highlight java"><code><span class="kd">interface</span> <span class="nc">Grid</span> <span class="o">{</span>
+  <span class="n">CellState</span> <span class="n">at</span><span class="o">(</span><span class="n">Coordinate</span> <span class="n">coordinate</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre>
+
+<blockquote>
+  <p>At each <span style="background-color: yellow">step in time, the following transitions</span> occur…
+The first <span style="background-color: yellow">generation</span> is created by applying the above rules simultaneously to every cell in the seed—births and deaths occur simultaneously, and the discrete moment at which this happens is sometimes <span style="background-color: yellow">called a tick (in other words, each generation is a pure function of the preceding one)</span>.</p>
+</blockquote>
+
+<p>From this part of the algorithm it is clear that GOL is a function of the form</p>
+
+<blockquote>
+  <p>tick(tick(tick(… (tick(seed))))</p>
+</blockquote>
+
+<p>Specifically we require a function called Tick which transforms a generation represented as <code>Grid</code> to a new generation also represented as <code>Grid</code>.  In Java 8 this function has the following form.</p>
+
+<pre class="highlight java"><code><span class="kd">class</span> <span class="nc">Tick</span> <span class="kd">implements</span> <span class="n">Function</span><span class="o">&lt;</span><span class="n">Grid</span><span class="o">,</span> <span class="n">Grid</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">Grid</span> <span class="n">apply</span><span class="o">(</span><span class="n">Grid</span> <span class="n">generation</span><span class="o">)</span> <span class="o">{</span>
+    <span class="o">...</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<blockquote>
+  <p>At <span style="background-color: yellow">each step in time</span>, the following transitions occur:</p>
+
+  <ul class="default-ul">
+    <li><span style="background-color: yellow">Any live cell</span> …</li>
+    <li><span style="background-color: yellow">Any live cell</span> …</li>
+    <li><span style="background-color: yellow">Any live cell</span> …</li>
+    <li><span style="background-color: yellow">Any dead cell</span> …</li>
+  </ul>
+</blockquote>
+
+<p>The structure of the algorithm describes a transition at a cell level and, specifically, it describes transformation rules in terms of every single cell within a generation.  From this <code>Tick</code> can now be enriched into the following.</p>
+
+<pre class="highlight java"><code><span class="kd">class</span> <span class="nc">Tick</span> <span class="kd">implements</span> <span class="n">Function</span><span class="o">&lt;</span><span class="n">Grid</span><span class="o">,</span> <span class="n">Grid</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">Grid</span> <span class="n">apply</span><span class="o">(</span><span class="n">Grid</span> <span class="n">generation</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">generation</span><span class="o">.</span><span class="na">mapCells</span><span class="o">(</span><span class="n">c</span> <span class="o">-&gt;</span> <span class="n">tickCell</span><span class="o">(</span><span class="n">generation</span><span class="o">,</span> <span class="n">c</span><span class="o">));</span>
+  <span class="o">}</span>
+
+  <span class="kd">private</span> <span class="n">CellState</span> <span class="n">tickCell</span><span class="o">(</span><span class="n">Grid</span> <span class="n">generation</span><span class="o">,</span> <span class="n">Coordinate</span> <span class="n">coordinate</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">generation</span><span class="o">.</span><span class="na">at</span><span class="o">(</span><span class="n">coordinate</span><span class="o">))</span> <span class="o">{</span>
+      <span class="o">...</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<p>In order to implement this change <code>Grid</code> needs to be enhanced with the method <code>mapCells</code>.</p>
+
+<pre class="highlight java"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Grid</span> <span class="o">{</span>
+  <span class="n">Grid</span> <span class="n">mapCells</span><span class="o">(</span><span class="n">Function</span><span class="o">&lt;</span><span class="n">Coordinate</span><span class="o">,</span> <span class="n">CellState</span><span class="o">&gt;</span> <span class="n">cellMap</span><span class="o">);</span>
+  <span class="n">CellState</span> <span class="n">at</span><span class="o">(</span><span class="n">Coordinate</span> <span class="n">coordinate</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre>
+
+<p>There is of course a small technical concern with implementing <code>mapCells</code> in that <code>Grid</code> represents an <em>infinite</em> grid.  I'll return to this concern a little later - for now though let's focus on transcribing GOL and, specifically, the last piece of the algorithm which is contained within <code>tickCell</code>.</p>
+
+<p>Returning to the heart of the algorithm there are four scenarios which can be treated separately.</p>
+
+<blockquote>
+  <ul class="default-ul">
+    <li>Any <span style="background-color: yellow">live cell with fewer than two live neighbours dies</span>, as if caused by under-population.</li>
+  </ul>
+</blockquote>
+
+<p>Folding this into <code>Tick</code> we then get</p>
+
+<pre class="highlight java"><code><span class="kd">class</span> <span class="nc">Tick</span> <span class="kd">implements</span> <span class="n">Function</span><span class="o">&lt;</span><span class="n">Grid</span><span class="o">,</span> <span class="n">Grid</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">Grid</span> <span class="n">apply</span><span class="o">(</span><span class="n">Grid</span> <span class="n">generation</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">generation</span><span class="o">.</span><span class="na">mapCells</span><span class="o">(</span><span class="n">c</span> <span class="o">-&gt;</span> <span class="n">tickCell</span><span class="o">(</span><span class="n">generation</span><span class="o">,</span> <span class="n">c</span><span class="o">));</span>
+  <span class="o">}</span>
+
+  <span class="kd">private</span> <span class="n">CellState</span> <span class="n">tickCell</span><span class="o">(</span><span class="n">Grid</span> <span class="n">generation</span><span class="o">,</span> <span class="n">Coordinate</span> <span class="n">coordinate</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="kt">int</span> <span class="n">numberOfAliveNeighbours</span> <span class="o">=</span> <span class="n">generation</span><span class="o">.</span><span class="na">numberOfAliveNeighbours</span><span class="o">(</span><span class="n">coordinate</span><span class="o">);</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">generation</span><span class="o">.</span><span class="na">at</span><span class="o">(</span><span class="n">coordinate</span><span class="o">))</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nl">ALIVE:</span>
+        <span class="k">return</span> <span class="o">(</span><span class="n">numberOfAliveNeighbours</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">)</span> <span class="o">?</span> <span class="n">DEAD</span>
+                <span class="o">:</span> <span class="o">...</span>
+        <span class="o">...</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<blockquote>
+  <ul class="default-ul">
+    <li>Any <span style="background-color: yellow">live cell with two or three live neighbours lives</span> on to the next generation.</li>
+  </ul>
+</blockquote>
+
+<pre class="highlight java"><code><span class="kd">class</span> <span class="nc">Tick</span> <span class="kd">implements</span> <span class="n">Function</span><span class="o">&lt;</span><span class="n">Grid</span><span class="o">,</span> <span class="n">Grid</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">Grid</span> <span class="n">apply</span><span class="o">(</span><span class="n">Grid</span> <span class="n">generation</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">generation</span><span class="o">.</span><span class="na">mapCells</span><span class="o">(</span><span class="n">c</span> <span class="o">-&gt;</span> <span class="n">tickCell</span><span class="o">(</span><span class="n">generation</span><span class="o">,</span> <span class="n">c</span><span class="o">));</span>
+  <span class="o">}</span>
+
+  <span class="kd">private</span> <span class="n">CellState</span> <span class="n">tickCell</span><span class="o">(</span><span class="n">Grid</span> <span class="n">generation</span><span class="o">,</span> <span class="n">Coordinate</span> <span class="n">coordinate</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="kt">int</span> <span class="n">numberOfAliveNeighbours</span> <span class="o">=</span> <span class="n">generation</span><span class="o">.</span><span class="na">numberOfAliveNeighbours</span><span class="o">(</span><span class="n">coordinate</span><span class="o">);</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">generation</span><span class="o">.</span><span class="na">at</span><span class="o">(</span><span class="n">coordinate</span><span class="o">))</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nl">ALIVE:</span>
+        <span class="k">return</span> <span class="o">(</span><span class="n">numberOfAliveNeighbours</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">)</span> <span class="o">?</span> <span class="n">DEAD</span>
+                <span class="o">:</span> <span class="o">(</span><span class="n">numberOfAliveNeighbours</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">||</span> <span class="n">numberOfAliveNeighbours</span> <span class="o">==</span> <span class="mi">3</span><span class="o">)</span> <span class="o">?</span> <span class="n">ALIVE</span>
+                <span class="o">:</span> <span class="o">...</span>
+        <span class="o">...</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<blockquote>
+  <ul class="default-ul">
+    <li>Any <span style="background-color: yellow">live cell with more than three live neighbours dies</span>, as if by over-population.</li>
+  </ul>
+</blockquote>
+
+<pre class="highlight java"><code><span class="kd">class</span> <span class="nc">Tick</span> <span class="kd">implements</span> <span class="n">Function</span><span class="o">&lt;</span><span class="n">Grid</span><span class="o">,</span> <span class="n">Grid</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">Grid</span> <span class="n">apply</span><span class="o">(</span><span class="n">Grid</span> <span class="n">generation</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">generation</span><span class="o">.</span><span class="na">mapCells</span><span class="o">(</span><span class="n">c</span> <span class="o">-&gt;</span> <span class="n">tickCell</span><span class="o">(</span><span class="n">generation</span><span class="o">,</span> <span class="n">c</span><span class="o">));</span>
+  <span class="o">}</span>
+
+  <span class="kd">private</span> <span class="n">CellState</span> <span class="n">tickCell</span><span class="o">(</span><span class="n">Grid</span> <span class="n">generation</span><span class="o">,</span> <span class="n">Coordinate</span> <span class="n">coordinate</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="kt">int</span> <span class="n">numberOfAliveNeighbours</span> <span class="o">=</span> <span class="n">generation</span><span class="o">.</span><span class="na">numberOfAliveNeighbours</span><span class="o">(</span><span class="n">coordinate</span><span class="o">);</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">generation</span><span class="o">.</span><span class="na">at</span><span class="o">(</span><span class="n">coordinate</span><span class="o">))</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nl">ALIVE:</span>
+        <span class="k">return</span> <span class="o">(</span><span class="n">numberOfAliveNeighbours</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">)</span> <span class="o">?</span> <span class="n">DEAD</span>
+                <span class="o">:</span> <span class="o">(</span><span class="n">numberOfAliveNeighbours</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">||</span> <span class="n">numberOfAliveNeighbours</span> <span class="o">==</span> <span class="mi">3</span><span class="o">)</span> <span class="n">ALIVE</span>
+                <span class="o">:</span> <span class="n">DEAD</span><span class="o">;</span>
+        <span class="o">...</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<blockquote>
+  <ul class="default-ul">
+    <li>Any <span style="background-color: yellow">dead cell with exactly three live neighbours becomes a live cell</span>, as if by reproduction.</li>
+  </ul>
+</blockquote>
+
+<pre class="highlight java"><code><span class="kd">class</span> <span class="nc">Tick</span> <span class="kd">implements</span> <span class="n">Function</span><span class="o">&lt;</span><span class="n">Grid</span><span class="o">,</span> <span class="n">Grid</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">Grid</span> <span class="n">apply</span><span class="o">(</span><span class="n">Grid</span> <span class="n">generation</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">generation</span><span class="o">.</span><span class="na">mapCells</span><span class="o">(</span><span class="n">c</span> <span class="o">-&gt;</span> <span class="n">tickCell</span><span class="o">(</span><span class="n">generation</span><span class="o">,</span> <span class="n">c</span><span class="o">));</span>
+  <span class="o">}</span>
+
+  <span class="kd">private</span> <span class="n">CellState</span> <span class="n">tickCell</span><span class="o">(</span><span class="n">Grid</span> <span class="n">generation</span><span class="o">,</span> <span class="n">Coordinate</span> <span class="n">coordinate</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="kt">int</span> <span class="n">numberOfAliveNeighbours</span> <span class="o">=</span> <span class="n">generation</span><span class="o">.</span><span class="na">numberOfAliveNeighbours</span><span class="o">(</span><span class="n">coordinate</span><span class="o">);</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">generation</span><span class="o">.</span><span class="na">at</span><span class="o">(</span><span class="n">coordinate</span><span class="o">))</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nl">ALIVE:</span>
+        <span class="k">return</span> <span class="o">(</span><span class="n">numberOfAliveNeighbours</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">)</span> <span class="o">?</span> <span class="n">DEAD</span>
+                <span class="o">:</span> <span class="o">(</span><span class="n">numberOfAliveNeighbours</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">||</span> <span class="n">numberOfAliveNeighbours</span> <span class="o">==</span> <span class="mi">3</span><span class="o">)</span> <span class="n">ALIVE</span>
+                <span class="o">:</span> <span class="n">DEAD</span><span class="o">;</span>
+      <span class="k">default</span><span class="o">:</span>
+      <span class="k">case</span> <span class="nl">DEAD:</span>
+        <span class="k">return</span> <span class="o">(</span><span class="n">numberOfAliveNeighbours</span> <span class="o">===</span> <span class="mi">3</span><span class="o">)</span> <span class="o">?</span> <span class="n">ALIVE</span>
+                <span class="o">:</span> <span class="n">DEAD</span><span class="o">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<p>In applying these rules we have needed to add the method <code>numberOfAliveNeighbours</code> into the interface of <code>Grid</code>.</p>
+
+<pre class="highlight java"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Grid</span> <span class="o">{</span>
+  <span class="kt">int</span> <span class="n">numberOfAliveNeighbours</span><span class="o">(</span><span class="n">Coordinate</span> <span class="n">coordinate</span><span class="o">);</span>
+  <span class="n">Grid</span> <span class="n">forEach</span><span class="o">(</span><span class="n">Function</span><span class="o">&lt;</span><span class="n">Coordinate</span><span class="o">,</span> <span class="n">CellState</span><span class="o">&gt;</span> <span class="n">cellMap</span><span class="o">);</span>
+  <span class="n">CellState</span> <span class="n">at</span><span class="o">(</span><span class="n">Coordinate</span> <span class="n">coordinate</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre>
+
+<p>Before finishing off transcribing the algorithm I need to return to <code>Grid.mapCells</code>.  In a pure sense we are stuck - the algorithm describes a transformation from one infinite <code>Grid</code> to a second infinite <code>Grid</code>.  However, looking at the details of the algorithm, it is clear that any <code>DEAD</code> cell that is surrounded by only <code>DEAD</code> cells will remain <code>DEAD</code> in the next generation.  Therefore the only cells that participate in this algorithm are those cells that have at least a single <code>ALIVE</code> neighbour.  So if the <code>seed</code> has a finite number of <code>ALIVE</code> cells we can conclude that the participating cells is a finite number.</p>
+
+<p>In order to progress I am going to introduce the method <code>Grid.mapParticipatingCells</code> which iterates over all those cells that have at least a single <code>ALIVE</code> neighbour.  <code>Tick</code> trivially changes to</p>
+
+<pre class="highlight java"><code><span class="kd">class</span> <span class="nc">Tick</span> <span class="kd">implements</span> <span class="n">Function</span><span class="o">&lt;</span><span class="n">Grid</span><span class="o">,</span> <span class="n">Grid</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">Grid</span> <span class="n">apply</span><span class="o">(</span><span class="n">Grid</span> <span class="n">generation</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">generation</span><span class="o">.</span><span class="na">mapParticipatingCells</span><span class="o">(</span><span class="n">c</span> <span class="o">-&gt;</span> <span class="n">tickCell</span><span class="o">(</span><span class="n">generation</span><span class="o">,</span> <span class="n">c</span><span class="o">));</span>
+  <span class="o">}</span>
+
+  <span class="kd">private</span> <span class="n">CellState</span> <span class="n">tickCell</span><span class="o">(</span><span class="n">Grid</span> <span class="n">generation</span><span class="o">,</span> <span class="n">Coordinate</span> <span class="n">coordinate</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="kt">int</span> <span class="n">numberOfAliveNeighbours</span> <span class="o">=</span> <span class="n">generation</span><span class="o">.</span><span class="na">numberOfAliveNeighbours</span><span class="o">(</span><span class="n">coordinate</span><span class="o">);</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">generation</span><span class="o">.</span><span class="na">at</span><span class="o">(</span><span class="n">coordinate</span><span class="o">))</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nl">ALIVE:</span>
+        <span class="k">return</span> <span class="o">(</span><span class="n">numberOfAliveNeighbours</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">)</span> <span class="o">?</span> <span class="n">DEAD</span>
+                <span class="o">:</span> <span class="o">(</span><span class="n">numberOfAliveNeighbours</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">||</span> <span class="n">numberOfAliveNeighbours</span> <span class="o">==</span> <span class="mi">3</span><span class="o">)</span> <span class="n">ALIVE</span>
+                <span class="o">:</span> <span class="n">DEAD</span><span class="o">;</span>
+      <span class="k">default</span><span class="o">:</span>
+      <span class="k">case</span> <span class="nl">DEAD:</span>
+        <span class="k">return</span> <span class="o">(</span><span class="n">numberOfAliveNeighbours</span> <span class="o">===</span> <span class="mi">3</span><span class="o">)</span> <span class="o">?</span> <span class="n">ALIVE</span>
+                <span class="o">:</span> <span class="n">DEAD</span><span class="o">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<p>whilst <code>Grid</code> drops <code>mapCells</code> with the replacement <code>mapParticipatingCells</code>.</p>
+
+<pre class="highlight java"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Grid</span> <span class="o">{</span>
+  <span class="kt">int</span> <span class="n">numberOfAliveNeighbours</span><span class="o">(</span><span class="n">Coordinate</span> <span class="n">coordinate</span><span class="o">);</span>
+  <span class="n">Grid</span> <span class="n">mapParticipatingCells</span><span class="o">(</span><span class="n">Function</span><span class="o">&lt;</span><span class="n">Coordinate</span><span class="o">,</span> <span class="n">CellState</span><span class="o">&gt;</span> <span class="n">cellMap</span><span class="o">);</span>
+  <span class="n">CellState</span> <span class="n">at</span><span class="o">(</span><span class="n">Coordinate</span> <span class="n">coordinate</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre>
+
+<h2 id="closing">Closing</h2>
+
+<p>What started out as a TDD exercise to implement GOL has turned into a much simpler problem - implement the three methods contained within <code>Grid</code>.  The remainder of the GOL solution is nothing more than an exercise in transcribing the algorithm from English into Java 8.</p>
+
+<p>I will not show how to TDD <code>Grid</code> as this is a relatively simple exercise.  The code that accompanies this note has two implementations - one a set based implementation and the second a linked list styled implementation.  Interestingly both of these implementations have the following characteristics:</p>
+
+<ul class="default-ul">
+  <li>The instances of <code>Grid</code> are value objects, and</li>
+  <li>Instances of <code>Grid</code> are composed using a builder.</li>
+</ul>
+
+<p>I found this interesting because all of my previous pure TDD GOL implementations made the <code>Grid</code> abstraction mutable.</p>
+
+<p>Finally, having come to the end of this implementation, I found no need to refactor <code>Grid</code> away and replace it with a standard Java library.  Doing so would have had some severe consequences:</p>
+
+<ul class="default-ul">
+  <li>The standard library would have leaked into <code>Tick</code> and materially damaged the readability of that class,</li>
+  <li>It would have become necessary to commit to an implementation of <code>Grid</code> - as it stands the source contains two implementations which can be swopped out with a third depending on the need, and</li>
+  <li>The algorithm is the algorithm.  To make this implementation time efficient I have no doubt that much progress can be made by building an optimised version of <code>Grid</code> and, specifically, the method <code>mapParticipatingCells</code>.  By collapsing <code>Grid</code> into a standard library implementation this opportunity would have been lost.</li>
+</ul>
+
+<h2 id="some-scala">Some Scala?</h2>
+
+<p>Out of curiosity I went through the same process and wrote a Scala version of the above code.  This is what it looked like.</p>
+
+<pre class="highlight scala"><code><span class="k">package</span> <span class="nn">gol</span>
+
+<span class="k">trait</span> <span class="nc">CellState</span>
+
+<span class="k">case</span> <span class="k">object</span> <span class="nc">ALIVE</span> <span class="k">extends</span> <span class="nc">CellState</span>
+<span class="k">case</span> <span class="k">object</span> <span class="nc">DEAD</span> <span class="k">extends</span> <span class="nc">CellState</span>
+
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Coordinate</span><span class="o">(</span><span class="n">x</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">y</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span>
+
+<span class="k">trait</span> <span class="nc">Grid</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">numberOfLiveNeighbours</span><span class="o">(</span><span class="n">c</span><span class="k">:</span> <span class="kt">Coordinate</span><span class="o">)</span><span class="k">:</span> <span class="kt">Int</span>
+  <span class="k">def</span> <span class="n">mapParticipating</span><span class="o">(</span><span class="n">f</span><span class="k">:</span> <span class="kt">Coordinate</span> <span class="o">=&gt;</span> <span class="nc">CellState</span><span class="o">)</span><span class="k">:</span> <span class="kt">Grid</span>
+  <span class="k">def</span> <span class="n">at</span><span class="o">(</span><span class="n">coordinate</span><span class="k">:</span> <span class="kt">Coordinate</span><span class="o">)</span><span class="k">:</span> <span class="kt">CellState</span>
+<span class="o">}</span>
+
+<span class="k">package</span> <span class="nn">object</span> <span class="n">gol</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">tick</span><span class="o">(</span><span class="n">generation</span><span class="k">:</span> <span class="kt">Grid</span><span class="o">)</span><span class="k">:</span> <span class="kt">Grid</span> <span class="o">=</span>
+    <span class="n">generation</span><span class="o">.</span><span class="n">mapParticipating</span><span class="o">(</span><span class="n">c</span> <span class="k">=&gt;</span> <span class="o">{</span>
+      <span class="k">val</span> <span class="n">numberOfAliveNeighbors</span> <span class="k">=</span> <span class="n">generation</span><span class="o">.</span><span class="n">numberOfLiveNeighbours</span><span class="o">(</span><span class="n">c</span><span class="o">)</span>
+      <span class="n">generation</span><span class="o">.</span><span class="n">at</span><span class="o">(</span><span class="n">c</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+        <span class="k">case</span> <span class="nc">ALIVE</span> <span class="k">=&gt;</span>
+          <span class="k">if</span> <span class="o">(</span><span class="n">numberOfAliveNeighbors</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">)</span> <span class="nc">DEAD</span>
+          <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">numberOfAliveNeighbors</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">||</span> <span class="n">numberOfAliveNeighbors</span> <span class="o">==</span> <span class="mi">3</span><span class="o">)</span> <span class="nc">ALIVE</span>
+          <span class="k">else</span> <span class="nc">DEAD</span>
+        <span class="k">case</span> <span class="nc">DEAD</span> <span class="k">=&gt;</span>
+          <span class="k">if</span> <span class="o">(</span><span class="n">numberOfAliveNeighbors</span> <span class="o">==</span> <span class="mi">3</span><span class="o">)</span> <span class="nc">ALIVE</span>
+          <span class="k">else</span> <span class="nc">DEAD</span>
+      <span class="o">}</span>
+    <span class="o">})</span>
+<span class="o">}</span>
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>This exercise has reminded me that much of what we as developers do is to translate a requirement into a software implementation that fulfills that requirement.  Too often though we start from the ground up thinking that we have nothing to start with.  Holding the DRY principle close and being open to where semantic facts are recorded can greatly simplify our day-to-day and increase the quality of our software by reducing cognitive dissonance when stepping between human representations and software representations.</p>
+
+
+          
+          <hr>
+          <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+          <div class="fb-like" data-href="https://graeme-lockley.github.io/posts/20160227-conways-game-of-life/" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div>
+            <!-- posts/20160227-conways-game-of-life.html -->
+          
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2017 <a href="https://github.com/graeme-lockley">Ideas in Software</a></p>
+    </div>
+  </footer>
+
+  <script src="/assets/javascripts/application-b1079a0e.js" type="text/javascript"></script>
+  
+</body>
+</html>

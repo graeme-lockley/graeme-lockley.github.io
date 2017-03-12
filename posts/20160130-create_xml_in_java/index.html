@@ -1,0 +1,1001 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script>
+  var host = "graeme-lockley.github.io"
+  if (window.location.host == host && window.location.protocol != "https:") {
+    window.location.protocol = "https:"
+  }
+  </script>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <meta name="author" content="graemel@no9.co.za">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- Use title if it's in the page YAML frontmatter -->
+  <title>What is the best way to create XML in Java?</title>
+
+  <link href="/assets/stylesheets/application-5f1b61a5.css" media="screen" rel="stylesheet" type="text/css" />
+  <!-- <link href="/assets/stylesheets/Skeleton-2.0.4/normalize-510da396.css" media="screen" rel="stylesheet" type="text/css" />
+  <link href="/assets/stylesheets/Skeleton-2.0.4/skeleton-9b4967f6.css" media="screen" rel="stylesheet" type="text/css" /> -->
+
+  
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-74997490-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+</head>
+
+<body class="posts posts_20160130-create_xml_in_java posts_20160130-create_xml_in_java_index">
+  <div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
+
+  <header class="site-header">
+    <nav class="site-nav container" role="navigation">
+  <a class="navbar-brand" href="/">
+    Ideas in Software
+  </a>
+
+<!--
+  <ul class="nav-links">
+    <li><a href="/">home</a>
+      <ul></ul>
+    </li>
+    <li><i class="fa fa-angle-double-right"></i><a href="/docs/">docs</a>
+      <ul>
+        <li><a href="/docs/bitters">bitters</a></li>
+        <li><a href="/docs/markdown">markdown</a></li>
+      </ul>
+    </li>
+    <li><i class="fa fa-angle-double-right"></i><a href="https://github.com/dnajd/rails-loaded">github</a>
+      <ul>
+        <li><a href="https://github.com/dnajd/rails-loaded">rails</a></li>
+        <li><a href="https://github.com/dnajd/middleman-loaded">middleman</a></li>
+        <li><a href="https://github.com/dnajd/ruby_tester">ruby tester</a></li>
+        <li><a href="https://github.com/dnajd/load_runner">load runner</a></li>
+      </ul>
+    </li>
+  </ul>
+-->
+
+  <!-- <div class="mobile-menu"><i class="fa fa-navicon"></i></div> -->
+</nav>
+
+  </header>
+
+  <main class="site-main">
+    <div class="container module">
+      <div class="row">
+        <div class="twelve columns">
+          <h1 id="what-is-the-best-way-to-create-xml-in-java">What is the best way to create XML in Java?</h1>
+
+<p>A very common capability that many of my Java programs require is the ability to create XML.  There are a couple of ways to do this but, more often that not, the techniques that I have seen suffer from a number of issues:</p>
+
+<ul class="default-ul">
+  <li>They are unable to reliably create XML.  I am not referring to namespaces or any other XML meta feature but rather the inability to consistently markup XML special characters like '&lt;', '&gt;' and '&amp;'.</li>
+  <li>More often than not, even though XML is created, there is no need to read the XML back into Java.  However I often see a marshalling/unmarshalling solution being used without considering trade-offs.</li>
+  <li>Insufficient consideration to boiler-plate code - this typically happens when the code base grows organically and there is a reluctance to refactor because the code is (mostly) working.</li>
+</ul>
+
+<p>What I would like to show in this note is the common set of techniques that I have seen and then to offer my opinion on the trade-offs between the different techniques.</p>
+
+<h2 id="source-code">Source Code</h2>
+
+<p>All of the code in this note can be found at <a href="https://github.com/graeme-lockley/create-xml-in-java-note">https://github.com/graeme-lockley/create-xml-in-java-note</a>.</p>
+
+<h1 id="background-to-the-business-problem">Background to the Business Problem</h1>
+
+<p>To make this note interesting I am going to extract a real example from an occurrence that I have encountered in my recent past.  One of the applications that I am intimately involved with is an application written around the year 2000.  It is still being used daily and has undergone numerous changes and enhancements over the course of it's lifespan.  This application remains strategic to the financial institution that built it.</p>
+
+<p>One of the responsibilities of this application is to generate a financial movement instruction on behalf of a client.  The XML message that is used to communicate this movement of funds is called a <code>payment</code> - the following is an example of this message instructing the movement of funds from a current account to a 3rd party bank account.</p>
+
+<pre class="highlight xml"><code><span class="nt">&lt;payment&gt;</span>
+  <span class="nt">&lt;creator</span>
+    <span class="na">application-name=</span><span class="s">"MobileApp"</span>
+    <span class="na">client-id=</span><span class="s">"GroupABC"</span>
+    <span class="na">correlation-id=</span><span class="s">"98729872398734"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;reference&gt;</span>PAY837137<span class="nt">&lt;/reference&gt;</span>
+  <span class="nt">&lt;when</span>
+    <span class="na">year=</span><span class="s">"2015"</span> <span class="na">month=</span><span class="s">"01"</span> <span class="na">day=</span><span class="s">"01"</span>
+    <span class="na">hour=</span><span class="s">"12"</span> <span class="na">minute=</span><span class="s">"32"</span> <span class="na">second=</span><span class="s">"67"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;action-date</span>
+    <span class="na">year=</span><span class="s">"2015"</span> <span class="na">month=</span><span class="s">"01"</span> <span class="na">day=</span><span class="s">"02"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;currency&gt;</span>USD<span class="nt">&lt;/currency&gt;</span>
+  <span class="nt">&lt;amount&gt;</span>123.45<span class="nt">&lt;/amount&gt;</span>
+  <span class="nt">&lt;debit-leg</span>
+    <span class="na">application-name=</span><span class="s">"CAHOST"</span>
+    <span class="na">account=</span><span class="s">"10010012345"</span>
+    <span class="na">name=</span><span class="s">"Bob Jones"</span>
+    <span class="na">reference=</span><span class="s">"BO123"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;credit-leg</span>
+    <span class="na">application-name=</span><span class="s">"IBANK"</span>
+    <span class="na">sort-code=</span><span class="s">"691216"</span>
+    <span class="na">account=</span><span class="s">"10011234567"</span>
+    <span class="na">name=</span><span class="s">"Stevie"</span>
+    <span class="na">reference=</span><span class="s">"From Jones"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/payment&gt;</span>
+</code></pre>
+
+<p>Structurally the message is fairly self explanatory but here are a couple of notes for clarity:</p>
+
+<ul class="default-ul">
+  <li>The <code>creator</code> communicates what application issued this message, on behalf of which client and the correlation ID of the instruction.</li>
+  <li>The <code>reference</code> is the payment's human understandable reference number.</li>
+  <li>The <code>when</code> is the date and time when the payment instruction was created.</li>
+  <li>The <code>action-date</code> is date when the funds will be removed from the source account and deposited into the destination account.  This date can be different from <code>when</code> due to the different batch rules and cut-off times of different payment gateways.</li>
+  <li>The <code>currency</code> and <code>amount</code> are self explanatory.</li>
+  <li>The <code>debit-leg</code> and <code>credit-leg</code> refer to the accounts that serve as the source and destination of the funds transfer.</li>
+</ul>
+
+<p>The following should be noted:</p>
+
+<ul class="default-ul">
+  <li>This message is beautifully ugly! The format was created in 1998 at a time when there were very few if any industry initiatives around financial services XML based message formats.  Strangely it's simplicity has the demonstrated advantage that it is easy to publish and consume <code>payment</code> messages across a host of different platforms.</li>
+  <li>I did not want to improve the format of this message because this is the current reality of the XML marshalling problem that serves as the background to this note.</li>
+</ul>
+
+<h1 id="technical-problem">Technical Problem</h1>
+
+<p>The technical problem faced is how to generate this XML from within Java.  In essence I need to create an implementation for the following interface.</p>
+
+<pre class="highlight java"><code><span class="kn">package</span> <span class="n">ideas</span><span class="o">.</span><span class="na">xml</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">MarshallPayment</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">marshall</span><span class="o">(</span><span class="n">PaymentValue</span> <span class="n">paymentValue</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre>
+
+<p>The value object <code>PaymentValue</code> is defined as</p>
+
+<pre class="highlight java"><code><span class="kn">package</span> <span class="n">ideas</span><span class="o">.</span><span class="na">xml</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">PaymentValue</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">creatorApplicationName</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">reference</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">creatorClientID</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">valueDate</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">currency</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">amount</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">debitApplication</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">debitSortCode</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">debitAccountNumber</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">debitAccountName</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">debitPaymentReference</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">creditApplication</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">creditSortCode</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">creditAccountNumber</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">creditAccountName</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">creditPaymentReference</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">transactionDate</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">transactionTime</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">debitLedgerAccountNumber</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">creditLedgeAccountNumber</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">correlationID</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="n">PaymentValue</span><span class="o">(</span>
+            <span class="n">String</span> <span class="n">creatorApplicationName</span><span class="o">,</span>
+            <span class="o">...)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">creatorApplicationName</span> <span class="o">=</span> <span class="n">creatorApplicationName</span><span class="o">;</span>
+        <span class="o">...</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<p>As you can see the value object is implemented crudely in the style of a structure - every field is <code>public final</code>, the constructor initializes each field and there are no getter or setters.  Nonetheless this value object suffers from a number of flaws which I would usually correct with a refactor:</p>
+
+<ul class="default-ul">
+  <li>Exploit Java's native data-types rather than leaving everything <code>String</code>,</li>
+  <li>Introduce some basic data modeling - especially given that the debit and credit legs are orthogonal and this state could therefore be captured as a single value object type,</li>
+  <li>This class is crying out for other value objects to capture elementary data-types, and</li>
+  <li>Although not communicated in this class, some of these fields can be <code>null</code>.  I would therefore want to declare those fields as <code>Optional</code> and throw <code>NullPointerException</code> in the event that any attempt is made to initialize this class with illegal values.</li>
+</ul>
+
+<p>I have however elected to leave this class as is.  The reasons for this are it more accurately reflects the reality of software that has been left to decay over a period of time and this underlying class is not material in exploring the different XML marshalling techniques in this note.</p>
+
+<h1 id="solution-approaches">Solution Approaches</h1>
+
+<p>I have created numerous implementations for the <code>MarshallPayment</code> interface:</p>
+
+<ul class="default-ul">
+  <li>
+    <p><strong>Native String Builder</strong></p>
+
+    <p>This is the simplest implementation of all and assembles raw XML by appending characters into a <code>StringBuilder</code> with the shape and content of the desired output, and then invoking <code>toString</code> on the builder.</p>
+  </li>
+  <li>
+    <p><strong>DSL with String Builder Visitor</strong></p>
+
+    <p>Using a bespoke XML DSL that allows the XML message to be described in Java and then, using a <code>StringBuilder</code> visitor, create the desired result.</p>
+  </li>
+  <li>
+    <p><strong>DSL with DOM Visitor</strong></p>
+
+    <p>Using a bespoke XML DSL that allows the XML message to be described in Java and then, using a DOM based visitor, create the desired result.</p>
+  </li>
+  <li>
+    <p><strong>FreeMarker Template</strong></p>
+
+    <p>This implementation makes use of a <a href="http://www.freemarker.org">FreeMarker</a> template to layout the XML.</p>
+  </li>
+  <li>
+    <p><strong>JAXB</strong></p>
+
+    <p>The JEE 'standard' approach - using an XSD definition for the message, generate the marshalling and unmarshalling code and then to use this code to create the desired output.</p>
+  </li>
+</ul>
+
+<p>The remainder of this section will highlight each of the different techniques through code extracts and provide some comments on the technique.</p>
+
+<h2 id="string-builder-appender">String Builder Appender</h2>
+
+<p>This technique is the simplest of all - create a <code>StringBuilder</code>, append the XML content into the <code>StringBuilder</code> and then return the resultant string.</p>
+
+<pre class="highlight java"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StringBuilderMarshallPayment</span> <span class="kd">implements</span> <span class="n">MarshallPayment</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="n">marshall</span><span class="o">(</span><span class="n">PaymentValue</span> <span class="n">paymentValue</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">StringBuilder</span> <span class="n">marshallResult</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuilder</span><span class="o">();</span>
+
+        <span class="n">marshallResult</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"&lt;payment&gt;"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"&lt;creator application-name="</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"\""</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creatorApplicationName</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"\""</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">" client-id="</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"\""</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creatorClientID</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"\""</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">" correlation-id="</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"\""</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">correlationID</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"\""</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"/&gt;"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"&lt;reference&gt;"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">reference</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"&lt;/reference&gt;"</span><span class="o">)</span>
+        <span class="o">...</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creditSortCode</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">marshallResult</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">" sort-code="</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\""</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creditSortCode</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\""</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="o">...</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creditPaymentReference</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">marshallResult</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">" reference="</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\""</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">encode</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creditPaymentReference</span><span class="o">)).</span><span class="na">append</span><span class="o">(</span><span class="s">"\""</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="o">...</span>
+        <span class="n">marshallResult</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"/&gt;"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"&lt;/payment&gt;"</span><span class="o">);</span>
+
+        <span class="k">return</span> <span class="n">marshallResult</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<h3 id="timing">Timing</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th style="text-align: right">Duration</th>
+      <th style="text-align: right">Relative Index All</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Native String Builder</td>
+      <td style="text-align: right">53ms</td>
+      <td style="text-align: right">1.00</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The column <em>Relative Index All</em> in the above table is carried though across all of the timing tables to show the relative performance of each implementation against this implementation.</p>
+
+<h3 id="analysis">Analysis</h3>
+
+<p>Pros:</p>
+
+<ul class="default-ul">
+  <li>This is the simplest technique to get going quickly.</li>
+  <li>Not constrained by XML syntax or even XML conventions.</li>
+  <li>Fast - very fast giving it the relative index of 1.00.</li>
+</ul>
+
+<p>Cons:</p>
+
+<ul class="default-ul">
+  <li>Marking up of special XML characters like <code>&lt;</code>, <code>&gt;</code> and <code>&amp;</code> needs to be done explicitly.  In the above example note that the credit payment reference is encoded prior to appending.  In my experience this need for explicit marking up of content results in an enormous waste of time both from a testing perspective and production incidents where elements that needed to be marked up were not.</li>
+  <li>The code does not match the shape of the XML but rather is a simple stream of instructions - this makes understanding and maintaining the code difficult.</li>
+  <li>The developer needs to make sure that the string that is returned is well formed XML.  This results in greater effort and energy spent on unit tests to ensure that the XML is well formed.</li>
+</ul>
+
+<h2 id="dsl-with-dom-visitor">DSL with DOM Visitor</h2>
+
+<p>There are two parts to this technique - firstly creating the XML into one or other structure using a DSL and then creating a visitor to traverse this structure and emit a string representation of that structure.</p>
+
+<h3 id="xml-dsl">XML DSL</h3>
+
+<p>I created a simple XML DSL builder which is in the package <code>ideas.xml.dsl</code>.  Rather than explaining how it works this is how it was used to create an <code>XMLElement</code> for the payment example.</p>
+
+<pre class="highlight java"><code><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">DSLMarshallPayment</span> <span class="kd">implements</span> <span class="n">MarshallPayment</span> <span class="o">{</span>
+  <span class="kd">protected</span> <span class="kd">static</span> <span class="n">XMLElement</span> <span class="n">getXmlElement</span><span class="o">(</span><span class="n">PaymentValue</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">document</span><span class="o">(</span><span class="s">"payment"</span><span class="o">,</span>
+      <span class="n">body</span><span class="o">()</span>
+        <span class="o">.</span><span class="na">addElement</span><span class="o">(</span><span class="s">"creator"</span><span class="o">,</span>
+          <span class="n">attributes</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"application-name"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">creatorApplicationName</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"client-id"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">creatorClientID</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"correlation-id"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">correlationID</span><span class="o">))</span>
+        <span class="o">.</span><span class="na">addElement</span><span class="o">(</span><span class="s">"reference"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">reference</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">addElement</span><span class="o">(</span><span class="s">"when"</span><span class="o">,</span>
+          <span class="n">attributes</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"year"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">transactionDate</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">4</span><span class="o">))</span>
+            <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"month"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">transactionDate</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="mi">6</span><span class="o">))</span>
+            <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"day"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">transactionDate</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">6</span><span class="o">,</span> <span class="mi">8</span><span class="o">))</span>
+            <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"hour"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">transactionTime</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">2</span><span class="o">))</span>
+            <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"minute"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">transactionTime</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="mi">4</span><span class="o">))</span>
+            <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"second"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">transactionTime</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="mi">6</span><span class="o">)))</span>
+        <span class="o">.</span><span class="na">addElement</span><span class="o">(</span><span class="s">"action-date"</span><span class="o">,</span>
+          <span class="n">attributes</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"year"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">valueDate</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">4</span><span class="o">))</span>
+            <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"month"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">valueDate</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="mi">6</span><span class="o">))</span>
+            <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"day"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">valueDate</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">6</span><span class="o">,</span> <span class="mi">8</span><span class="o">)))</span>
+        <span class="o">.</span><span class="na">addElement</span><span class="o">(</span><span class="s">"currency"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">currency</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">addElement</span><span class="o">(</span><span class="s">"amount"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">amount</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">addElement</span><span class="o">(</span><span class="s">"debit-leg"</span><span class="o">,</span>
+          <span class="n">attributes</span><span class="o">()</span>
+              <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"application-name"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">debitApplication</span><span class="o">)</span>
+              <span class="o">.</span><span class="na">addIfNotNull</span><span class="o">(</span><span class="s">"sort-code"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">debitSortCode</span><span class="o">)</span>
+              <span class="o">.</span><span class="na">addIfNotNull</span><span class="o">(</span><span class="s">"account"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">debitAccountNumber</span><span class="o">)</span>
+              <span class="o">.</span><span class="na">addIfNotNull</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">debitAccountName</span><span class="o">)</span>
+              <span class="o">.</span><span class="na">addIfNotNull</span><span class="o">(</span><span class="s">"reference"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">debitPaymentReference</span><span class="o">)</span>
+              <span class="o">.</span><span class="na">addIfNotNull</span><span class="o">(</span><span class="s">"ledger-account-number"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">debitLedgerAccountNumber</span><span class="o">))</span>
+        <span class="o">.</span><span class="na">addElement</span><span class="o">(</span><span class="s">"credit-leg"</span><span class="o">,</span>
+          <span class="n">attributes</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"application-name"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">creditApplication</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">addIfNotNull</span><span class="o">(</span><span class="s">"sort-code"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">creditSortCode</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">addIfNotNull</span><span class="o">(</span><span class="s">"account"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">creditAccountNumber</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">addIfNotNull</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">creditAccountName</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">addIfNotNull</span><span class="o">(</span><span class="s">"reference"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">creditPaymentReference</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">addIfNotNull</span><span class="o">(</span><span class="s">"ledger-account-number"</span><span class="o">,</span> <span class="n">value</span><span class="o">.</span><span class="na">creditLedgeAccountNumber</span><span class="o">))</span>
+    <span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<h3 id="dom-visitor">DOM Visitor</h3>
+
+<p>In order to create a DOM visitor I created a visitor interface for the XML structure which looks as follows</p>
+
+<pre class="highlight java"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">XMLVisitor</span> <span class="o">{</span>
+    <span class="kt">void</span> <span class="n">visit</span><span class="o">(</span><span class="n">XMLElement</span> <span class="n">xmlElement</span><span class="o">);</span>
+
+    <span class="kt">void</span> <span class="n">visit</span><span class="o">(</span><span class="n">XMLText</span> <span class="n">xmlText</span><span class="o">);</span>
+
+    <span class="kt">void</span> <span class="n">visit</span><span class="o">(</span><span class="n">XMLBodyLiteral</span> <span class="n">xmlBodyLiteral</span><span class="o">);</span>
+
+    <span class="n">String</span> <span class="n">asString</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre>
+
+<p>Finally I created an implementation for this interface which assembles a DOM object whilst visiting the underlying XML structure and transforms the DOM object into a string using builtin libraries.  This implementation looks as follows.</p>
+
+<pre class="highlight java"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DOMVisitor</span> <span class="kd">implements</span> <span class="n">XMLVisitor</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Document</span> <span class="n">doc</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Element</span><span class="o">&gt;</span> <span class="n">currentElement</span> <span class="o">=</span> <span class="n">Optional</span><span class="o">.</span><span class="na">empty</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">DocumentBuilder</span> <span class="n">docBuilder</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Transformer</span> <span class="n">transformer</span><span class="o">;</span>
+
+    <span class="kd">static</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">DocumentBuilderFactory</span> <span class="n">docFactory</span> <span class="o">=</span> <span class="n">DocumentBuilderFactory</span><span class="o">.</span><span class="na">newInstance</span><span class="o">();</span>
+            <span class="n">docBuilder</span> <span class="o">=</span> <span class="n">docFactory</span><span class="o">.</span><span class="na">newDocumentBuilder</span><span class="o">();</span>
+
+            <span class="n">TransformerFactory</span> <span class="n">tf</span> <span class="o">=</span> <span class="n">TransformerFactory</span><span class="o">.</span><span class="na">newInstance</span><span class="o">();</span>
+            <span class="n">transformer</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="na">newTransformer</span><span class="o">();</span>
+            <span class="n">transformer</span><span class="o">.</span><span class="na">setOutputProperty</span><span class="o">(</span><span class="n">OutputKeys</span><span class="o">.</span><span class="na">OMIT_XML_DECLARATION</span><span class="o">,</span> <span class="s">"yes"</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ParserConfigurationException</span> <span class="o">|</span> <span class="n">TransformerConfigurationException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="n">ex</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">DOMVisitor</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">ParserConfigurationException</span> <span class="o">{</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">docBuilder</span><span class="o">.</span><span class="na">newDocument</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">visit</span><span class="o">(</span><span class="n">XMLElement</span> <span class="n">xmlElement</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Element</span><span class="o">&gt;</span> <span class="n">previous</span> <span class="o">=</span> <span class="n">currentElement</span><span class="o">;</span>
+        <span class="n">Element</span> <span class="n">newElement</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="na">createElement</span><span class="o">(</span><span class="n">xmlElement</span><span class="o">.</span><span class="na">name</span><span class="o">());</span>
+
+        <span class="n">currentElement</span><span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="n">x</span> <span class="o">-&gt;</span> <span class="o">(</span><span class="n">Node</span><span class="o">)</span> <span class="n">x</span><span class="o">).</span><span class="na">orElse</span><span class="o">(</span><span class="n">doc</span><span class="o">).</span><span class="na">appendChild</span><span class="o">(</span><span class="n">newElement</span><span class="o">);</span>
+        <span class="n">currentElement</span> <span class="o">=</span> <span class="n">Optional</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">newElement</span><span class="o">);</span>
+
+        <span class="k">for</span> <span class="o">(</span><span class="n">XMLAttribute</span> <span class="n">attr</span> <span class="o">:</span> <span class="n">xmlElement</span><span class="o">.</span><span class="na">attributes</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">currentElement</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">setAttribute</span><span class="o">(</span><span class="n">attr</span><span class="o">.</span><span class="na">name</span><span class="o">(),</span> <span class="n">attr</span><span class="o">.</span><span class="na">value</span><span class="o">());</span>
+        <span class="o">}</span>
+
+        <span class="k">for</span> <span class="o">(</span><span class="n">XMLBody</span> <span class="n">body</span> <span class="o">:</span> <span class="n">xmlElement</span><span class="o">.</span><span class="na">bodyElements</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">body</span><span class="o">.</span><span class="na">visit</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="n">currentElement</span> <span class="o">=</span> <span class="n">previous</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">visit</span><span class="o">(</span><span class="n">XMLText</span> <span class="n">xmlText</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">currentElement</span><span class="o">.</span><span class="na">orElseThrow</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">"Unable to attach a text block at the root of an XML document"</span><span class="o">));</span>
+
+        <span class="kd">final</span> <span class="n">Text</span> <span class="n">textNode</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="na">createTextNode</span><span class="o">(</span><span class="n">xmlText</span><span class="o">.</span><span class="na">text</span><span class="o">());</span>
+        <span class="n">currentElement</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">appendChild</span><span class="o">(</span><span class="n">textNode</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">visit</span><span class="o">(</span><span class="n">XMLBodyLiteral</span> <span class="n">xmlBodyLiteral</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">currentElement</span><span class="o">.</span><span class="na">orElseThrow</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="n">IllegalArgumentException</span><span class="o">(</span><span class="s">"Unable to attach a text block at the root of an XML document"</span><span class="o">));</span>
+
+        <span class="kd">final</span> <span class="n">Text</span> <span class="n">textNode</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="na">createTextNode</span><span class="o">(</span><span class="n">xmlBodyLiteral</span><span class="o">.</span><span class="na">xmlString</span><span class="o">());</span>
+        <span class="n">currentElement</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">appendChild</span><span class="o">(</span><span class="n">textNode</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">String</span> <span class="n">asString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">StringWriter</span> <span class="n">writer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringWriter</span><span class="o">();</span>
+            <span class="n">transformer</span><span class="o">.</span><span class="na">transform</span><span class="o">(</span><span class="k">new</span> <span class="n">DOMSource</span><span class="o">(</span><span class="n">doc</span><span class="o">),</span> <span class="k">new</span> <span class="n">StreamResult</span><span class="o">(</span><span class="n">writer</span><span class="o">));</span>
+            <span class="k">return</span> <span class="n">writer</span><span class="o">.</span><span class="na">getBuffer</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">TransformerException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="n">ex</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<p>The DOM visitor implementation is straightforward - it stores the root element and the current element and then, as it traverses the underlying XML structure it assembles a DOM representation of the XML document that the DSL created.  Finally the <code>asString</code> method then transforms the DOM object into a string and returns that.</p>
+
+<h3 id="timing-1">Timing</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th style="text-align: right">Duration</th>
+      <th style="text-align: right">Relative Index All</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>DSL with DOM Visitor</td>
+      <td style="text-align: right">718ms</td>
+      <td style="text-align: right">13.55</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="analysis-1">Analysis</h3>
+
+<p>Pros:</p>
+
+<ul class="default-ul">
+  <li>Visually assembling the XML using this DSL aligns the code to the natural structure of the <code>Payment</code> message.  By looking at the Java code a developer is able to 'feel' the XML structure aiding understanding and therefore quality.</li>
+  <li>The XML structure is independent of the visitor.  As will be shown next, the only change when using the <em>DSL with String Builder Visitor</em> is to create a new visitor - the DSL stays the same.</li>
+  <li>The DSL can be applied to any XML document and is independent of <code>Payment</code>.</li>
+  <li>No markup is necessary.</li>
+  <li>Minimal boiler-plate code.</li>
+</ul>
+
+<p>Cons:</p>
+
+<ul class="default-ul">
+  <li>Even-though the DSL is simple it does represent a new language that needs to be learnt and supported by the development team.</li>
+</ul>
+
+<h2 id="dsl-with-string-builder-visitor">DSL with String Builder Visitor</h2>
+
+<p>This technique uses the same DSL described above but has a visitor implementation that uses the same <code>StringBuilder</code> technique that was illustrated the <em>Native String Builder</em>.</p>
+
+<pre class="highlight java"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StringBuilderVisitor</span> <span class="kd">implements</span> <span class="n">XMLVisitor</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">StringBuilder</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuilder</span><span class="o">();</span>
+
+    <span class="kd">public</span> <span class="n">StringBuilderVisitor</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">ParserConfigurationException</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">visit</span><span class="o">(</span><span class="n">XMLElement</span> <span class="n">xmlElement</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">result</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"&lt;"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">xmlElement</span><span class="o">.</span><span class="na">name</span><span class="o">());</span>
+
+        <span class="k">for</span> <span class="o">(</span><span class="n">XMLAttribute</span> <span class="n">attr</span> <span class="o">:</span> <span class="n">xmlElement</span><span class="o">.</span><span class="na">attributes</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">result</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">" "</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">attr</span><span class="o">.</span><span class="na">name</span><span class="o">()).</span><span class="na">append</span><span class="o">(</span><span class="s">"='"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">XMLEncoder</span><span class="o">.</span><span class="na">encode</span><span class="o">(</span><span class="n">attr</span><span class="o">.</span><span class="na">value</span><span class="o">())).</span><span class="na">append</span><span class="o">(</span><span class="s">"'"</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">xmlElement</span><span class="o">.</span><span class="na">bodyElements</span><span class="o">().</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">result</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"/&gt;"</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="n">result</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"&gt;"</span><span class="o">);</span>
+            <span class="k">for</span> <span class="o">(</span><span class="n">XMLBody</span> <span class="n">body</span> <span class="o">:</span> <span class="n">xmlElement</span><span class="o">.</span><span class="na">bodyElements</span><span class="o">())</span> <span class="o">{</span>
+                <span class="n">body</span><span class="o">.</span><span class="na">visit</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="n">result</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"&lt;/"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">xmlElement</span><span class="o">.</span><span class="na">name</span><span class="o">()).</span><span class="na">append</span><span class="o">(</span><span class="s">"&gt;"</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">visit</span><span class="o">(</span><span class="n">XMLText</span> <span class="n">xmlText</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">result</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">XMLEncoder</span><span class="o">.</span><span class="na">encode</span><span class="o">(</span><span class="n">xmlText</span><span class="o">.</span><span class="na">text</span><span class="o">()));</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">visit</span><span class="o">(</span><span class="n">XMLBodyLiteral</span> <span class="n">xmlBodyLiteral</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">result</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">xmlBodyLiteral</span><span class="o">.</span><span class="na">xmlString</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">String</span> <span class="n">asString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<h3 id="timing-2">Timing</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th style="text-align: right">Duration</th>
+      <th style="text-align: right">Relative Index All</th>
+      <th style="text-align: right">Relative Index</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>DSL with String Builder Visitor</td>
+      <td style="text-align: right">114ms</td>
+      <td style="text-align: right">2.15</td>
+      <td style="text-align: right">1.00</td>
+    </tr>
+    <tr>
+      <td>DSL with DOM Visitor</td>
+      <td style="text-align: right">718ms</td>
+      <td style="text-align: right">13.55</td>
+      <td style="text-align: right">6.30</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="analysis-2">Analysis</h3>
+
+<p>The pros/cons are similar to <em>DSL with DOM Visitor</em> so I shall not repeat them but only highlight additions.</p>
+
+<p>Pros:</p>
+
+<ul class="default-ul">
+  <li>As illustrated through this piece of code and <em>DSL with DOM Visitor</em> the visitor is completely independent of the DSL itself and therefore <code>Payment</code>.  However this code is tightly dependent on the internal representation of an XML document.</li>
+  <li>This is the fastest implementation which generates the XML off of an intermediate structure.  The only quicker implementation is the <em>Native String Builder</em>.</li>
+</ul>
+
+<p>Cons:</p>
+
+<ul class="default-ul">
+  <li>The visitor implementation needs to make use of a markup method to ensure that special characters are correctly represented.  This encoding function needs to be built and tested.</li>
+</ul>
+
+<h2 id="freemarker-template">FreeMarker Template</h2>
+
+<p>The technique employed here is to use a templating language to create the XML output and then, through the templating language, have the values extracted out of the passed value object during document generation.  The templating language used is <a href="www.freemarker.org">FreeMarker</a>.</p>
+
+<p>The boiler-plate Java is limited to the following class although this class does make use of a utility function class <code>FreeMarkerUtils</code>.</p>
+
+<pre class="highlight java"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FreeMarkerMarshallPayment</span> <span class="kd">implements</span> <span class="n">MarshallPayment</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="n">marshall</span><span class="o">(</span><span class="n">PaymentValue</span> <span class="n">paymentValue</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">dataModel</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+        <span class="n">dataModel</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"payment"</span><span class="o">,</span> <span class="n">paymentValue</span><span class="o">);</span>
+
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">FreeMarkerUtils</span><span class="o">.</span><span class="na">template</span><span class="o">(</span><span class="n">dataModel</span><span class="o">,</span> <span class="s">"PaymentTemplate.ftl"</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">TemplateException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="n">ex</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<p>The magic with this technique happens in the template <code>PaymentTemplate.ftl</code>.</p>
+
+<pre class="highlight plaintext"><code>&lt;#escape c as c?xml&gt;
+&lt;payment&gt;
+    &lt;creator application-name="${payment.creatorApplicationName}" client-id="${payment.creatorClientID}" correlation-id="${payment.correlationID}"/&gt;
+    &lt;reference&gt;${payment.reference}&lt;/reference&gt;
+    &lt;when year="${payment.transactionDate[0..3]}" month="${payment.transactionDate[4..5]}" day="${payment.transactionDate[6..7]}" hour="${payment.transactionTime[0..1]}" minute="${payment.transactionTime[2..3]}" second="${payment.transactionTime[4..5]}"/&gt;
+    &lt;action-date year="${payment.valueDate[0..3]}" month="${payment.valueDate[4..5]}" day="${payment.valueDate[6..7]}"/&gt;
+    &lt;currency&gt;${payment.currency}&lt;/currency&gt;
+    &lt;amount&gt;${payment.amount}&lt;/amount&gt;
+    &lt;debit-leg
+        application-name="${payment.debitApplication}"
+&lt;#if payment.debitSortCode??&gt;
+        sort-code="${payment.debitSortCode}"
+&lt;/#if&gt;
+&lt;#if payment.debitAccountNumber??&gt;
+        account="${payment.debitAccountNumber}"
+&lt;/#if&gt;
+&lt;#if payment.debitAccountName??&gt;
+        name="${payment.debitAccountName}"
+&lt;/#if&gt;
+&lt;#if payment.debitPaymentReference??&gt;
+        reference="${payment.debitPaymentReference}"
+&lt;/#if&gt;
+&lt;#if payment.debitLedgerAccountNumber??&gt;
+        ledger-account-number="${payment.debitLedgerAccountNumber}"
+&lt;/#if&gt;
+    /&gt;
+    &lt;credit-leg
+        application-name="${payment.creditApplication}"
+&lt;#if payment.creditSortCode??&gt;
+        sort-code="${payment.creditSortCode}"
+&lt;/#if&gt;
+&lt;#if payment.creditAccountNumber??&gt;
+        account="${payment.creditAccountNumber}"
+&lt;/#if&gt;
+&lt;#if payment.creditAccountName??&gt;
+        name="${payment.creditAccountName}"
+&lt;/#if&gt;
+&lt;#if payment.creditPaymentReference??&gt;
+        reference="${payment.creditPaymentReference}"
+&lt;/#if&gt;
+&lt;#if payment.creditLedgerAccountNumber??&gt;
+        ledger-account-number="${payment.creditLedgerAccountNumber}"
+&lt;/#if&gt;
+    /&gt;
+&lt;/payment&gt;
+&lt;/#escape&gt;
+</code></pre>
+
+<h3 id="timing-3">Timing</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th style="text-align: right">Duration</th>
+      <th style="text-align: right">Relative Index All</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>FreeMarker Template</td>
+      <td style="text-align: right">831ms</td>
+      <td style="text-align: right">15.68</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="analysis-3">Analysis</h3>
+
+<p>Pros:</p>
+
+<ul class="default-ul">
+  <li>The Java boiler-plate code is minimal and limited to setting up the FreeMarker model and selecting a template.</li>
+  <li>By instructing FreeMarker to treat all expressions as XML it is unnecessary to provide any further markup instructions.</li>
+</ul>
+
+<p>Cons:</p>
+
+<ul class="default-ul">
+  <li>The <code>#if</code> statements were cumbersome and broke the flow of the template impacting readability and therefore maintainability.</li>
+  <li>Needing to learn a templating language with its own expression language.</li>
+  <li>The templating expression language does not allow the accessing of member values on model objects.  It is was therefore necessary to change <code>PaymentValue</code> to include getter methods over and above the <code>public final</code> member variables.</li>
+</ul>
+
+<h2 id="jaxb">JAXB</h2>
+
+<p>This technique is the typical JEE style - create an XSD, generate the marshalling/unmarshalling code, populate the generated Java beans and then marshall the beans into a string.</p>
+
+<p>The following is the XSD that was to describe <code>Payment</code> and what was used in the generation of a set of cooperating Java beans.</p>
+
+<pre class="highlight xml"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</span>
+<span class="nt">&lt;xs:schema</span> <span class="na">xmlns:xs=</span><span class="s">"http://www.w3.org/2001/XMLSchema"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">"payment"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;xs:complexType&gt;</span>
+            <span class="nt">&lt;xs:sequence&gt;</span>
+                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">"creator"</span> <span class="na">type=</span><span class="s">"CreatorType"</span> <span class="na">minOccurs=</span><span class="s">"1"</span> <span class="na">maxOccurs=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">"reference"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">minOccurs=</span><span class="s">"1"</span> <span class="na">maxOccurs=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">"when"</span> <span class="na">type=</span><span class="s">"TimestampType"</span> <span class="na">minOccurs=</span><span class="s">"1"</span> <span class="na">maxOccurs=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">"action-date"</span> <span class="na">type=</span><span class="s">"ActionDateType"</span> <span class="na">minOccurs=</span><span class="s">"1"</span> <span class="na">maxOccurs=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">"currency"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">minOccurs=</span><span class="s">"1"</span> <span class="na">maxOccurs=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">"amount"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">minOccurs=</span><span class="s">"1"</span> <span class="na">maxOccurs=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">"debit-leg"</span> <span class="na">type=</span><span class="s">"TransactionLegType"</span> <span class="na">minOccurs=</span><span class="s">"1"</span> <span class="na">maxOccurs=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">"credit-leg"</span> <span class="na">type=</span><span class="s">"TransactionLegType"</span> <span class="na">minOccurs=</span><span class="s">"1"</span> <span class="na">maxOccurs=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;/xs:sequence&gt;</span>
+        <span class="nt">&lt;/xs:complexType&gt;</span>
+    <span class="nt">&lt;/xs:element&gt;</span>
+    <span class="nt">&lt;xs:complexType</span> <span class="na">name=</span><span class="s">"CreatorType"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"application-name"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"required"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"client-id"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"required"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"correlation-id"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"optional"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/xs:complexType&gt;</span>
+    <span class="nt">&lt;xs:complexType</span> <span class="na">name=</span><span class="s">"TimestampType"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"year"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"required"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"month"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"required"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"day"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"required"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"hour"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"required"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"minute"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"required"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"second"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"required"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/xs:complexType&gt;</span>
+    <span class="nt">&lt;xs:complexType</span> <span class="na">name=</span><span class="s">"ActionDateType"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"year"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"required"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"month"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"required"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"day"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"required"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/xs:complexType&gt;</span>
+    <span class="nt">&lt;xs:complexType</span> <span class="na">name=</span><span class="s">"TransactionLegType"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"application-name"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"required"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"sort-code"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"optional"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"account"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"optional"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"name"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"optional"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"reference"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"optional"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">"ledger-account-number"</span> <span class="na">type=</span><span class="s">"xs:string"</span> <span class="na">use=</span><span class="s">"optional"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/xs:complexType&gt;</span>
+<span class="nt">&lt;/xs:schema&gt;</span>
+</code></pre>
+
+<p>The implementation of <code>MarshallPayment</code> using JAXB is straightforward.</p>
+
+<pre class="highlight java"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">JAXBMarshallPayment</span> <span class="kd">implements</span> <span class="n">MarshallPayment</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="n">marshall</span><span class="o">(</span><span class="n">PaymentValue</span> <span class="n">paymentValue</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">generated</span><span class="o">.</span><span class="na">CreatorType</span> <span class="n">createApplication</span> <span class="o">=</span> <span class="k">new</span> <span class="n">generated</span><span class="o">.</span><span class="na">CreatorType</span><span class="o">();</span>
+        <span class="n">createApplication</span><span class="o">.</span><span class="na">setApplicationName</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creatorApplicationName</span><span class="o">);</span>
+        <span class="n">createApplication</span><span class="o">.</span><span class="na">setClientId</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creatorClientID</span><span class="o">);</span>
+        <span class="n">createApplication</span><span class="o">.</span><span class="na">setCorrelationId</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">correlationID</span><span class="o">);</span>
+
+        <span class="n">generated</span><span class="o">.</span><span class="na">TimestampType</span> <span class="n">when</span> <span class="o">=</span> <span class="k">new</span> <span class="n">generated</span><span class="o">.</span><span class="na">TimestampType</span><span class="o">();</span>
+        <span class="n">when</span><span class="o">.</span><span class="na">setYear</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">transactionDate</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">4</span><span class="o">));</span>
+        <span class="n">when</span><span class="o">.</span><span class="na">setMonth</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">transactionDate</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="mi">6</span><span class="o">));</span>
+        <span class="n">when</span><span class="o">.</span><span class="na">setDay</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">transactionDate</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">6</span><span class="o">,</span> <span class="mi">8</span><span class="o">));</span>
+        <span class="n">when</span><span class="o">.</span><span class="na">setHour</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">transactionTime</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">2</span><span class="o">));</span>
+        <span class="n">when</span><span class="o">.</span><span class="na">setMinute</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">transactionTime</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="mi">4</span><span class="o">));</span>
+        <span class="n">when</span><span class="o">.</span><span class="na">setSecond</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">transactionTime</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="mi">6</span><span class="o">));</span>
+
+        <span class="n">generated</span><span class="o">.</span><span class="na">ActionDateType</span> <span class="n">actionDate</span> <span class="o">=</span> <span class="k">new</span> <span class="n">generated</span><span class="o">.</span><span class="na">ActionDateType</span><span class="o">();</span>
+        <span class="n">actionDate</span><span class="o">.</span><span class="na">setYear</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">valueDate</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">4</span><span class="o">));</span>
+        <span class="n">actionDate</span><span class="o">.</span><span class="na">setMonth</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">valueDate</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="mi">6</span><span class="o">));</span>
+        <span class="n">actionDate</span><span class="o">.</span><span class="na">setDay</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">valueDate</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">6</span><span class="o">,</span> <span class="mi">8</span><span class="o">));</span>
+
+        <span class="n">generated</span><span class="o">.</span><span class="na">TransactionLegType</span> <span class="n">debitLeg</span> <span class="o">=</span> <span class="k">new</span> <span class="n">generated</span><span class="o">.</span><span class="na">TransactionLegType</span><span class="o">();</span>
+        <span class="n">debitLeg</span><span class="o">.</span><span class="na">setApplicationName</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">debitApplication</span><span class="o">);</span>
+        <span class="n">debitLeg</span><span class="o">.</span><span class="na">setSortCode</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">debitSortCode</span><span class="o">);</span>
+        <span class="n">debitLeg</span><span class="o">.</span><span class="na">setAccount</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">debitAccountNumber</span><span class="o">);</span>
+        <span class="n">debitLeg</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">debitAccountName</span><span class="o">);</span>
+        <span class="n">debitLeg</span><span class="o">.</span><span class="na">setReference</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">debitPaymentReference</span><span class="o">);</span>
+        <span class="n">debitLeg</span><span class="o">.</span><span class="na">setLedgerAccountNumber</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">debitLedgerAccountNumber</span><span class="o">);</span>
+
+        <span class="n">generated</span><span class="o">.</span><span class="na">TransactionLegType</span> <span class="n">creditLeg</span> <span class="o">=</span> <span class="k">new</span> <span class="n">generated</span><span class="o">.</span><span class="na">TransactionLegType</span><span class="o">();</span>
+        <span class="n">creditLeg</span><span class="o">.</span><span class="na">setApplicationName</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creditApplication</span><span class="o">);</span>
+        <span class="n">creditLeg</span><span class="o">.</span><span class="na">setSortCode</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creditSortCode</span><span class="o">);</span>
+        <span class="n">creditLeg</span><span class="o">.</span><span class="na">setAccount</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creditAccountNumber</span><span class="o">);</span>
+        <span class="n">creditLeg</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creditAccountName</span><span class="o">);</span>
+        <span class="n">creditLeg</span><span class="o">.</span><span class="na">setReference</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creditPaymentReference</span><span class="o">);</span>
+        <span class="n">creditLeg</span><span class="o">.</span><span class="na">setLedgerAccountNumber</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">creditLedgeAccountNumber</span><span class="o">);</span>
+
+        <span class="n">generated</span><span class="o">.</span><span class="na">Payment</span> <span class="n">payment</span> <span class="o">=</span> <span class="k">new</span> <span class="n">generated</span><span class="o">.</span><span class="na">Payment</span><span class="o">();</span>
+        <span class="n">payment</span><span class="o">.</span><span class="na">setCreator</span><span class="o">(</span><span class="n">createApplication</span><span class="o">);</span>
+        <span class="n">payment</span><span class="o">.</span><span class="na">setReference</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">reference</span><span class="o">);</span>
+        <span class="n">payment</span><span class="o">.</span><span class="na">setWhen</span><span class="o">(</span><span class="n">when</span><span class="o">);</span>
+        <span class="n">payment</span><span class="o">.</span><span class="na">setActionDate</span><span class="o">(</span><span class="n">actionDate</span><span class="o">);</span>
+        <span class="n">payment</span><span class="o">.</span><span class="na">setCurrency</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">currency</span><span class="o">);</span>
+        <span class="n">payment</span><span class="o">.</span><span class="na">setAmount</span><span class="o">(</span><span class="n">paymentValue</span><span class="o">.</span><span class="na">amount</span><span class="o">);</span>
+        <span class="n">payment</span><span class="o">.</span><span class="na">setDebitLeg</span><span class="o">(</span><span class="n">debitLeg</span><span class="o">);</span>
+        <span class="n">payment</span><span class="o">.</span><span class="na">setCreditLeg</span><span class="o">(</span><span class="n">creditLeg</span><span class="o">);</span>
+
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">JAXBContext</span> <span class="n">context</span> <span class="o">=</span> <span class="n">JAXBContext</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="n">generated</span><span class="o">.</span><span class="na">Payment</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+            <span class="n">Marshaller</span> <span class="n">m</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">createMarshaller</span><span class="o">();</span>
+
+            <span class="n">m</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">Marshaller</span><span class="o">.</span><span class="na">JAXB_FORMATTED_OUTPUT</span><span class="o">,</span> <span class="n">Boolean</span><span class="o">.</span><span class="na">FALSE</span><span class="o">);</span>
+            <span class="n">m</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">Marshaller</span><span class="o">.</span><span class="na">JAXB_FRAGMENT</span><span class="o">,</span> <span class="n">Boolean</span><span class="o">.</span><span class="na">TRUE</span><span class="o">);</span>
+
+            <span class="n">SchemaFactory</span> <span class="n">schemaFactory</span> <span class="o">=</span> <span class="n">SchemaFactory</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="n">XMLConstants</span><span class="o">.</span><span class="na">W3C_XML_SCHEMA_NS_URI</span><span class="o">);</span>
+            <span class="n">Schema</span> <span class="n">schema</span> <span class="o">=</span> <span class="n">schemaFactory</span><span class="o">.</span><span class="na">newSchema</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">"target/classes/Payment.xsd"</span><span class="o">));</span>
+
+            <span class="n">StringWriter</span> <span class="n">stringWriter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringWriter</span><span class="o">();</span>
+            <span class="n">m</span><span class="o">.</span><span class="na">marshal</span><span class="o">(</span><span class="n">payment</span><span class="o">,</span> <span class="n">stringWriter</span><span class="o">);</span>
+            <span class="k">return</span> <span class="n">stringWriter</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JAXBException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+
+<p>Notes:</p>
+
+<ul class="default-ul">
+  <li>The implementation shown above has been replaced with a class called <code>NaiveSchemaJAXBMarshallPayment</code>.  The reason for giving this implementation that name is:
+    <ul>
+      <li>At runtime much of the heavy lifting of the marshaller is taken up creating the marshaller as opposed to using the marshaller.  This implementation is then considered naive as a marshaller for <code>generated.Payment</code> is created every time an XML instance of <code>PaymentValue</code> is required.  The timings below show that this has significant overhead.</li>
+      <li>Even-though JAXB generates marshalling/unmarshalling code this code does not enforce any schema. To ensure schema validation it is necessary to explicitly associate the schema with the marshaller at runtime.</li>
+    </ul>
+  </li>
+  <li>This implementation has been split into 4 implementations to better understand the impact on performance:
+    <ul>
+      <li><strong>NaiveSchemaJAXBMarshallPayment</strong>: Marshaller is created on each invocation and the generated XML is guaranteed to be compliant with the schema</li>
+      <li><strong>NaiveSchemalessJAXBMarshallPayment</strong>: Marshaller is created on each invocation but the generated XML is not validated against any schema</li>
+      <li><strong>EfficientSchemaJAXBMarshallPayment</strong>: A marshaller is created once and reused on each invocation and the generated XML is guaranteed to be compliant with the schema</li>
+      <li><strong>EfficientSchemalessJAXBMarshallPayment</strong>: A marshaller is created once and reused on each invocation but the generated XML is not validated against any schema</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="timing-4">Timing</h3>
+
+<p>Over 10,000 iterations the following times were observed:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th style="text-align: right">Duration</th>
+      <th style="text-align: right">Relative Index All</th>
+      <th style="text-align: right">Relative Index</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>JAXB naive without schema enforcement</td>
+      <td style="text-align: right">58,862ms</td>
+      <td style="text-align: right">1,110.60</td>
+      <td style="text-align: right">512.10</td>
+    </tr>
+    <tr>
+      <td>JAXB naive with schema enforcement</td>
+      <td style="text-align: right">67,327ms</td>
+      <td style="text-align: right">1,270.32</td>
+      <td style="text-align: right">585.45</td>
+    </tr>
+    <tr>
+      <td>JAXB efficient without schema enforcement</td>
+      <td style="text-align: right">115ms</td>
+      <td style="text-align: right">2.17</td>
+      <td style="text-align: right">1.00</td>
+    </tr>
+    <tr>
+      <td>JAXB efficient with schema enforcement</td>
+      <td style="text-align: right">972ms</td>
+      <td style="text-align: right">16.45</td>
+      <td style="text-align: right">8.45</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="analysis-4">Analysis</h3>
+
+<p>Pros:</p>
+
+<ul class="default-ul">
+  <li>Externalising the structure of an XML document into an XSD is useful when needing to communicate the XML structure across multiple teams.</li>
+</ul>
+
+<p>Cons:</p>
+
+<ul class="default-ul">
+  <li>The constructing and assembling of the data transfer object to be marshaled is tedious.</li>
+  <li>The data transfer objects are anemic - seems like a missed opportunity.</li>
+  <li>Validation is not automatically performed on the created XML and therefore optional.</li>
+  <li>Setup of the JAXB generator.</li>
+  <li>A naive marshaller imposes a significant overhead on execution.</li>
+  <li>Marshaller reuse is necessary for handling load however marshallers are not thread-safe therefore requiring extra complexity to manage a marshaller pool in a multi-threaded application.</li>
+</ul>
+
+<h1 id="comparison">Comparison</h1>
+
+<p>The following table shows a comparison of all of the timings against the different techniques.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th style="text-align: right">Duration</th>
+      <th style="text-align: right">Relative Index</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Native String Builder</td>
+      <td style="text-align: right">53ms</td>
+      <td style="text-align: right">1.00</td>
+    </tr>
+    <tr>
+      <td>DSL with String Builder Visitor</td>
+      <td style="text-align: right">114ms</td>
+      <td style="text-align: right">2.15</td>
+    </tr>
+    <tr>
+      <td>DSL with DOM Visitor</td>
+      <td style="text-align: right">718ms</td>
+      <td style="text-align: right">13.55</td>
+    </tr>
+    <tr>
+      <td>FreeMarker Template</td>
+      <td style="text-align: right">831ms</td>
+      <td style="text-align: right">15.68</td>
+    </tr>
+    <tr>
+      <td>JAXB naive without schema enforcement</td>
+      <td style="text-align: right">58,862ms</td>
+      <td style="text-align: right">1,110.60</td>
+    </tr>
+    <tr>
+      <td>JAXB naive with schema enforcement</td>
+      <td style="text-align: right">67,327ms</td>
+      <td style="text-align: right">1,270.32</td>
+    </tr>
+    <tr>
+      <td>JAXB efficient without schema enforcement</td>
+      <td style="text-align: right">115ms</td>
+      <td style="text-align: right">2.17</td>
+    </tr>
+    <tr>
+      <td>JAXB efficient with schema enforcement</td>
+      <td style="text-align: right">972ms</td>
+      <td style="text-align: right">16.45</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="recommendation">Recommendation</h1>
+
+<p>Based on the timings and observations these are my recommendations:</p>
+
+<ul class="default-ul">
+  <li>For creating ad hoc pieces of XML or simple documents to be localised within an application I would use a simple XML DSL like <em>DSL with String Builder Visitor</em>.  This approach is performant, has IDE support, simple to implement and learn, and, if the DSL is well designed, would be readable.</li>
+  <li>For creating XML within a more structured environment where there is a strong TDD discipline, performance is critical I might consider <em>JAXB efficient without schema enforcement</em> otherwise I would recommend <em>JAXB efficient with schema enforcement</em>.</li>
+  <li>I can think of no circumstances where I would use a templating approach like FreeMarker.</li>
+  <li>I can think of no circumstances to use naive JAXB.</li>
+  <li>Even-though <em>Native String Builder</em> is performant, it should only be used in exceptional conditions where performance is an absolute premium.  Even under those circumstances I would be reticent in applying this technique without a robust set of generative unit tests and experienced developers who have a deep working understanding of XML and the consequence of special characters.</li>
+</ul>
+
+<h2 id="possible-further-work">Possible Further Work</h2>
+
+<p>During the preparation of this note the following was uncovered which warrants further effort:</p>
+
+<ul class="default-ul">
+  <li>I was keen to perform a stylistic code comparison but quickly found that I did not have sufficient objective criteria to apply. Texts like Robert Martin's <a href="https://www.goodreads.com/book/show/3735293-clean-code">Clean Code</a> can be evolved into a metrics framework, however this is more of a <em>shu-rule</em> where-as I gravitate more towards Kent Beck's <em>four rules of simple design</em> which is described in his book <a href="https://www.goodreads.com/book/show/67833.Extreme_Programming_Explained">Extreme Programming Explained</a> and elaborated by Martin Fowler in his article <a href="http://martinfowler.com/bliki/BeckDesignRules.html">BeckDesignRules</a>.  Unfortunately this assessment of design is very human requiring domain context and <em>ri-mastery</em>. For example how do you write software that can confirm whether or not a method name "reveals intention"?  Nonetheless I think this is an area of further work to understand how to practically perform a mechanical stylistic code comparison when comparing techniques such as in this note.</li>
+  <li>Build a super-simple library that can make marshall resource management effortless within a multi-threaded environment.</li>
+  <li>Extract the XML DSL developed for this note into a shared library.</li>
+</ul>
+
+
+          
+          <hr>
+          <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+          <div class="fb-like" data-href="https://graeme-lockley.github.io/posts/20160130-create_xml_in_java/" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div>
+            <!-- posts/20160130-create_xml_in_java.html -->
+          
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2017 <a href="https://github.com/graeme-lockley">Ideas in Software</a></p>
+    </div>
+  </footer>
+
+  <script src="/assets/javascripts/application-b1079a0e.js" type="text/javascript"></script>
+  
+</body>
+</html>

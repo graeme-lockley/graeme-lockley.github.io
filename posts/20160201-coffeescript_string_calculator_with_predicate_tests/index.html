@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script>
+  var host = "graeme-lockley.github.io"
+  if (window.location.host == host && window.location.protocol != "https:") {
+    window.location.protocol = "https:"
+  }
+  </script>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <meta name="author" content="graemel@no9.co.za">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- Use title if it's in the page YAML frontmatter -->
+  <title>From scratch property based testing with CoffeeScript</title>
+
+  <link href="/assets/stylesheets/application-5f1b61a5.css" media="screen" rel="stylesheet" type="text/css" />
+  <!-- <link href="/assets/stylesheets/Skeleton-2.0.4/normalize-510da396.css" media="screen" rel="stylesheet" type="text/css" />
+  <link href="/assets/stylesheets/Skeleton-2.0.4/skeleton-9b4967f6.css" media="screen" rel="stylesheet" type="text/css" /> -->
+
+  
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-74997490-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+</head>
+
+<body class="posts posts_20160201-coffeescript_string_calculator_with_predicate_tests posts_20160201-coffeescript_string_calculator_with_predicate_tests_index">
+  <div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
+
+  <header class="site-header">
+    <nav class="site-nav container" role="navigation">
+  <a class="navbar-brand" href="/">
+    Ideas in Software
+  </a>
+
+<!--
+  <ul class="nav-links">
+    <li><a href="/">home</a>
+      <ul></ul>
+    </li>
+    <li><i class="fa fa-angle-double-right"></i><a href="/docs/">docs</a>
+      <ul>
+        <li><a href="/docs/bitters">bitters</a></li>
+        <li><a href="/docs/markdown">markdown</a></li>
+      </ul>
+    </li>
+    <li><i class="fa fa-angle-double-right"></i><a href="https://github.com/dnajd/rails-loaded">github</a>
+      <ul>
+        <li><a href="https://github.com/dnajd/rails-loaded">rails</a></li>
+        <li><a href="https://github.com/dnajd/middleman-loaded">middleman</a></li>
+        <li><a href="https://github.com/dnajd/ruby_tester">ruby tester</a></li>
+        <li><a href="https://github.com/dnajd/load_runner">load runner</a></li>
+      </ul>
+    </li>
+  </ul>
+-->
+
+  <!-- <div class="mobile-menu"><i class="fa fa-navicon"></i></div> -->
+</nav>
+
+  </header>
+
+  <main class="site-main">
+    <div class="container module">
+      <div class="row">
+        <div class="twelve columns">
+          <h1 id="property-based-testing-with-coffeescript">Property Based Testing with CoffeeScript</h1>
+
+<p>Each Thursday a group of us get together to perform the <a href="http://osherove.com/tdd-kata-1">String Calculator Kata</a>.  This started out as an exercise in TDD and finding ways to extract efficiency out of our own development process.  Over time, however, our Thursday ritual evolved into a discovery of new languages and a learning of new techniques.  Having played with Scala I recently performed the kata using <a href="http://www.scalatest.org">ScalaTest</a> and, more specifically, property based tests (PBT).  This turned out to be a fun exercise as it not only resulted in a fewer number of unit tests but I was also able to identify a number of boundary conditions which none of us had noticed with cherry picked test data.</p>
+
+<p>My next attempt at this kata was using CoffeeScript and, more interestingly, I wanted to perform this kata using PBT.  Not having a testing framework like ScalaTest for CoffeeScript I set out to build one as part of the kata only to find that, with higher-order functions, this was a surprisingly simple task. I found that by knocking together tests in this way it was easy to explain to the audience what was happening and it made the exercise significantly more accessible - there was no mystery hidden away within a testing framework like ScalaTest.</p>
+
+<h2 id="background">Background</h2>
+
+<p>The examples and code extracts covered here can be found at <a href="https://github.com/graeme-lockley/string-calculator-coffeescript-pbt">https://github.com/graeme-lockley/string-calculator-coffeescript-pbt</a>.  The JavaScript libraries used are <a href="http://mochajs.org">Mocha</a> and <a href="http://chaijs.com">Chai</a>.</p>
+
+<h2 id="generators">Generators</h2>
+
+<p>The basic mechanism of PBT is to use a generator - a generator is a function which, when invoked, will return a random value based on the generator's constraints.  Incidentally when I say function within this context I am referring to a programming version of a function rather than the mathematical definition of a function.</p>
+
+<p>As an example let's say we would like a function that will return a random element from a list.  The following code will do this:</p>
+
+<pre class="highlight coffeescript"><code><span class="nx">oneOf</span> <span class="o">=</span> <span class="p">(</span><span class="nx">xs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">xs</span><span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="na">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">xs</span><span class="p">.</span><span class="na">length</span><span class="p">]</span>
+</code></pre>
+
+<p>However this code is not in the form of a generator in that it accepts a list of possible elements and then returns a random element from that list.  To convert this into a generator we return a function rather than an element.  So this code is then transformed as follows:</p>
+
+<pre class="highlight coffeescript"><code><span class="nx">oneOf</span> <span class="o">=</span> <span class="p">(</span><span class="nx">xs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="nx">xs</span><span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="na">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">xs</span><span class="p">.</span><span class="na">length</span><span class="p">]</span>
+</code></pre>
+
+<p>Incidentally the need to return a random integer within a fixed range is so common that this code is usually expressed in terms of the helper <code>integerInRange</code>:</p>
+
+<pre class="highlight coffeescript"><code><span class="nx">integerInRange</span> <span class="o">=</span> <span class="p">(</span><span class="nx">min</span><span class="p">,</span> <span class="nx">max</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">Math</span><span class="p">.</span><span class="na">round</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="na">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="nx">max</span> <span class="o">-</span> <span class="nx">min</span><span class="p">)</span> <span class="o">+</span> <span class="nx">min</span><span class="p">)</span>
+<span class="nx">oneOf</span> <span class="o">=</span> <span class="p">(</span><span class="nx">xs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="nx">xs</span><span class="p">[</span><span class="nx">integerInRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">xs</span><span class="p">.</span><span class="na">length</span><span class="p">)]</span>
+</code></pre>
+
+<p>So armed with this hint of insight let's work through the tests that were developed when performing the kata.</p>
+
+<h2 id="given-an-empty-string-should-return-0">Given an empty string should return 0</h2>
+
+<pre class="highlight coffeescript"><code><span class="nx">it</span> <span class="s">'Given an empty string should return 0'</span><span class="p">,</span> <span class="o">-&gt;</span>
+  <span class="nx">sc</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">''</span><span class="p">).</span><span class="na">should</span><span class="p">.</span><span class="na">equal</span> <span class="mi">0</span>
+</code></pre>
+
+<p>This is the simple scenario with no opportunity for using PBT.</p>
+
+<h2 id="given-a-non-negative-integer-should-return-its-value-if-less-than-1001-otherwise-0">Given a non-negative integer should return its value if less than 1001 otherwise 0</h2>
+
+<pre class="highlight coffeescript"><code><span class="nx">it</span> <span class="s">'Given a non-negative integer should return its value if less than 1001 otherwise 0'</span><span class="p">,</span> <span class="o">-&gt;</span>
+  <span class="nx">forAll</span><span class="p">(</span><span class="nx">nonNegativeIntegers</span><span class="p">)</span> <span class="p">(</span><span class="nx">n</span> <span class="o">-&gt;</span>
+    <span class="nx">result</span> <span class="o">=</span> <span class="k">if</span> <span class="nx">n</span> <span class="o">&lt;</span> <span class="mi">1001</span> <span class="k">then</span> <span class="nx">n</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="nx">sc</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="na">toString</span><span class="p">()).</span><span class="na">should</span><span class="p">.</span><span class="na">equal</span> <span class="nx">result</span>
+  <span class="p">)</span>
+</code></pre>
+
+<p>In this test we have made reference to two functions which need to be defined - <code>forAll</code> and <code>nonNegativeIntegers</code>.</p>
+
+<p><code>forAll</code> is a function which, given a generator and an expression, will apply the generator's result to the expression a prescribed number of times.  The default implementation of this function is</p>
+
+<pre class="highlight coffeescript"><code>  <span class="nx">forAll</span> <span class="o">=</span> <span class="p">(</span><span class="nx">gen</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nx">predicate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">predicate</span><span class="p">(</span><span class="nx">gen</span><span class="p">())</span> <span class="k">for</span> <span class="nx">lp</span> <span class="k">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">..</span><span class="mi">1000</span><span class="p">]</span>
+</code></pre>
+
+<p>Using the idea that a generator is a function which, when invoked, will return a value, <code>nonNegativeIntegers</code> is defined as</p>
+
+<pre class="highlight coffeescript"><code>  <span class="nx">nonNegativeIntegers</span> <span class="o">=</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="nx">integerInRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+</code></pre>
+
+<p>In this definition <code>nonNegativeIntegers()</code> will return a random number between 0 and 10,000.</p>
+
+<p>I was amazed at this point when I realised that PBT was simple and didn't require an enormous testing framework to get right.  All it needed was a little bit of randomness and higher-order functions.</p>
+
+<h2 id="given-non-negative-integers-separated-with-a-comma-should-return-the-sum-of-all-numbers-less-than-1001">Given non-negative integers separated with a comma should return the sum of all numbers less than 1001</h2>
+
+<pre class="highlight coffeescript"><code><span class="nx">it</span> <span class="s">'Given integers separated with a comma should return the sum of all numbers less than 1001'</span><span class="p">,</span> <span class="o">-&gt;</span>
+  <span class="nx">forAll</span><span class="p">(</span><span class="nx">nonEmptyListOf</span><span class="p">(</span><span class="nx">nonNegativeIntegers</span><span class="p">))</span> <span class="p">((</span><span class="nx">ns</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="nx">sc</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="nx">xs</span><span class="p">.</span><span class="na">join</span><span class="p">(</span><span class="s">','</span><span class="p">))</span> <span class="nx">should</span> <span class="nx">equal</span> <span class="nx">sum</span><span class="p">(</span><span class="nx">ns</span><span class="p">)</span>
+  <span class="p">)</span>
+</code></pre>
+
+<p>The additional functions that has been included in the above test is the generator <code>nonEmptyListOf</code> and a test utility function <code>sum</code>.  As the name suggests <code>nonEmptyList</code> is a generator that accepts a generator as argument and returns a function which, when called, will return a list of at least one element and no more than 10 elements with each element being generated from the originally passed generator.  Using the functions that we have already have these additional functions are defined as</p>
+
+<pre class="highlight coffeescript"><code><span class="nx">nonEmptyListOf</span> <span class="o">=</span> <span class="p">(</span><span class="nx">gen</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mi">1</span><span class="p">..</span><span class="na">integerInRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)].</span><span class="na">map</span><span class="p">((</span><span class="nx">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">gen</span><span class="p">())</span>
+
+<span class="nx">sum</span> <span class="o">=</span> <span class="p">(</span><span class="nx">ns</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">ns</span><span class="p">.</span><span class="na">filter</span><span class="p">((</span><span class="nx">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">x</span> <span class="o">&lt;</span> <span class="mi">1001</span><span class="p">).</span><span class="na">reduce</span><span class="p">(((</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">x</span> <span class="o">+</span> <span class="nx">y</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+</code></pre>
+
+<h2 id="given-non-negative-integers-separated-with-a-comma-or-newline-should-return-the-sum-of-all-numbers-less-than-1001">Given non-negative integers separated with a comma or newline should return the sum of all numbers less than 1001</h2>
+
+<pre class="highlight coffeescript"><code><span class="nx">it</span> <span class="s">'Given integers separated with a comma or newline should return the sum'</span><span class="p">,</span> <span class="o">-&gt;</span>
+  <span class="nx">forAll</span><span class="p">(</span><span class="nx">nonEmptyList</span><span class="p">(</span><span class="nx">nonNegativeIntegers</span><span class="p">))</span> <span class="p">((</span><span class="nx">ns</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="nx">sc</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="nx">mkString</span><span class="p">(</span><span class="nx">xs</span><span class="p">,</span> <span class="p">[</span><span class="s">','</span><span class="p">,</span> <span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">]))</span> <span class="nx">should</span> <span class="nx">equal</span> <span class="nx">sum</span><span class="p">(</span><span class="nx">ns</span><span class="p">)</span>
+  <span class="p">)</span>
+</code></pre>
+
+<p>I introduced no extra PBT functions although I did have to define the helper function <code>mkString</code> which I've provided below:</p>
+
+<pre class="highlight coffeescript"><code><span class="nx">mkString</span> <span class="o">=</span> <span class="p">(</span><span class="nx">xs</span><span class="p">,</span> <span class="nx">seps</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="k">if</span> <span class="nx">xs</span><span class="p">.</span><span class="na">length</span> <span class="o">is</span> <span class="mi">0</span> <span class="k">then</span> <span class="s">''</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="nx">xs</span><span class="p">.</span><span class="na">length</span> <span class="o">is</span> <span class="mi">1</span> <span class="k">then</span> <span class="nx">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="na">toString</span><span class="p">()</span>
+  <span class="k">else</span> <span class="nx">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="na">toString</span><span class="p">()</span> <span class="o">+</span> <span class="nx">oneOf</span><span class="p">(</span><span class="nx">seps</span><span class="p">)()</span> <span class="o">+</span> <span class="nx">mkString</span><span class="p">(</span><span class="nx">xs</span><span class="p">[</span><span class="mi">1</span><span class="p">..],</span> <span class="nx">seps</span><span class="p">)</span>
+</code></pre>
+
+<p>You will however notice that I made use of <code>oneOf</code> which was previously defined.</p>
+
+<h2 id="given-non-negative-integers-separated-by-a-custom-single-character-separator-should-return-the-sum-of-all-numbers-less-than-1001">Given non-negative integers separated by a custom single character separator should return the sum of all numbers less than 1001</h2>
+
+<pre class="highlight coffeescript"><code><span class="nx">it</span> <span class="s">'Given non-negative integers separated by a custom single character separator should return the sum of all numbers less than 1001'</span><span class="p">,</span> <span class="o">-&gt;</span>
+  <span class="nx">forAll2</span><span class="p">(</span><span class="nx">nonEmptyList</span><span class="p">(</span><span class="nx">integers</span><span class="p">),</span> <span class="nx">separators</span><span class="p">)</span> <span class="p">((</span><span class="nx">xs</span><span class="p">,</span> <span class="nx">sep</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="nx">sc</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">'//'</span> <span class="o">+</span> <span class="nx">sep</span> <span class="o">+</span> <span class="s">'</span><span class="se">\n</span><span class="s">'</span> <span class="o">+</span> <span class="nx">xs</span><span class="p">.</span><span class="na">join</span><span class="p">(</span><span class="nx">sep</span><span class="p">)).</span><span class="na">should</span><span class="p">.</span><span class="na">equal</span> <span class="nx">sum</span><span class="p">(</span><span class="nx">xs</span><span class="p">)</span>
+  <span class="p">)</span>
+</code></pre>
+
+<p>The simple implementation of separators is</p>
+
+<pre class="highlight coffeescript"><code><span class="nx">separators</span> <span class="o">=</span> <span class="p">()</span> <span class="o">-&gt;</span>  <span class="nb">String</span><span class="p">.</span><span class="na">fromCharCode</span><span class="p">(</span><span class="nx">integersInRange</span><span class="p">(</span><span class="mi">33</span><span class="p">,</span> <span class="mi">127</span><span class="p">))</span>
+</code></pre>
+
+<p>This implementation however does not work because not all characters within the character range are valid separators.  The obvious exclusions are the digits '0'-'9', dash '-' and the square brackets '[' ']'.  The following function, a filter, takes a generator and predicate and will continue to generate values until the predicate returns <code>true</code>.</p>
+
+<pre class="highlight coffeescript"><code><span class="nx">genFilter</span> <span class="o">=</span> <span class="p">(</span><span class="nx">gen</span><span class="p">,</span> <span class="nx">filter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span>
+    <span class="nx">result</span> <span class="o">=</span> <span class="nx">gen</span><span class="p">()</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="nx">filter</span><span class="p">(</span><span class="nx">result</span><span class="p">))</span>
+      <span class="nx">result</span> <span class="o">=</span> <span class="nx">gen</span><span class="p">()</span>
+    <span class="nx">result</span>
+  <span class="p">)</span>
+</code></pre>
+
+<p>The separators generator can now be expressed as</p>
+
+<pre class="highlight coffeescript"><code> <span class="nx">separators</span> <span class="o">=</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="nx">genFilter</span><span class="p">(</span>
+   <span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">String</span><span class="p">.</span><span class="na">fromCharCode</span><span class="p">(</span><span class="nx">integersInRange</span><span class="p">(</span><span class="mi">33</span><span class="p">,</span> <span class="mi">127</span><span class="p">)),</span>
+   <span class="p">(</span><span class="nx">ch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="o">!</span><span class="p">(</span><span class="nx">ch</span> <span class="o">&gt;=</span> <span class="s">'0'</span> <span class="o">&amp;&amp;</span> <span class="nx">ch</span> <span class="o">&lt;=</span> <span class="s">'9'</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">ch</span> <span class="o">!=</span> <span class="s">'-'</span> <span class="o">&amp;&amp;</span> <span class="nx">ch</span> <span class="o">!=</span> <span class="s">'['</span> <span class="o">&amp;&amp;</span> <span class="nx">ch</span> <span class="o">!=</span> <span class="s">']'</span><span class="p">)</span>
+</code></pre>
+
+<p>I also needed to introduce the function <code>forAll2</code> which accepts two generators rather than <code>forAll</code>'s  solitary generator.  This function is then defined as</p>
+
+<pre class="highlight coffeescript"><code><span class="nx">forAll2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">gen1</span><span class="p">,</span> <span class="nx">gen2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nx">predicate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">predicate</span><span class="p">(</span><span class="nx">gen1</span><span class="p">(),</span> <span class="nx">gen2</span><span class="p">())</span> <span class="k">for</span> <span class="nx">lp</span> <span class="k">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">..</span><span class="mi">1000</span><span class="p">]</span>
+</code></pre>
+
+<h2 id="given-non-negative-integers-separated-by-multiple-multi-character-separator-should-return-the-sum-of-all-numbers-less-than-1001">Given non-negative integers separated by multiple multi-character separator should return the sum of all numbers less than 1001</h2>
+
+<pre class="highlight coffeescript"><code><span class="nx">it</span> <span class="s">'Given non-negative integers separated by multiple multi-character separator should return the sum of all numbers less than 1001'</span><span class="p">,</span> <span class="o">-&gt;</span>
+ <span class="nx">forAll2</span><span class="p">(</span><span class="nx">nonEmptyListOf</span><span class="p">(</span><span class="nx">nonNegativeIntegers</span><span class="p">),</span> <span class="nx">nonEmptyListOf</span><span class="p">(</span><span class="nx">stringSeparator</span><span class="p">))</span> <span class="p">((</span><span class="nx">ns</span><span class="p">,</span> <span class="nx">seps</span><span class="p">)</span> <span class="o">-&gt;</span>
+   <span class="nx">sc</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">'//['</span> <span class="o">+</span> <span class="nx">seps</span><span class="p">.</span><span class="na">join</span><span class="p">(</span><span class="s">']['</span><span class="p">)</span> <span class="o">+</span> <span class="s">']</span><span class="se">\n</span><span class="s">'</span> <span class="o">+</span> <span class="nx">mkString</span><span class="p">(</span><span class="nx">ns</span><span class="p">,</span> <span class="nx">seps</span><span class="p">)).</span><span class="na">should</span><span class="p">.</span><span class="na">equal</span> <span class="nx">sum</span><span class="p">(</span><span class="nx">ns</span><span class="p">)</span>
+ <span class="p">)</span>
+</code></pre>
+
+<p>For this test I needed to introduce the generator <code>stringSeparator</code> which is defined in terms of <code>separator</code>.</p>
+
+<pre class="highlight coffeescript"><code><span class="nx">stringSeparator</span> <span class="o">=</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="nx">nonEmptyListOf</span><span class="p">(</span><span class="nx">separator</span><span class="p">)().</span><span class="na">join</span><span class="p">(</span><span class="s">''</span><span class="p">)</span>
+</code></pre>
+
+<h2 id="given-integers-separated-by-a-comma-or-newline-with-at-least-one-negative-should-throw-an-exception-with-the-negative-numbers-in-the-exception-message">Given integers separated by a comma or newline with at least one negative should throw an exception with the negative numbers in the exception message</h2>
+
+<pre class="highlight coffeescript"><code><span class="nx">it</span> <span class="s">'Given integers separated by a comma or newline with at least one negative should throw an exception with the negative numbers in the exception message'</span><span class="p">,</span> <span class="o">-&gt;</span>
+  <span class="nx">forAll</span><span class="p">(</span><span class="nx">nonEmptyListOf</span><span class="p">(</span><span class="nx">integers</span><span class="p">))</span> <span class="p">((</span><span class="nx">ns</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="nx">ns</span><span class="p">.</span><span class="na">filter</span><span class="p">((</span><span class="nx">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">).</span><span class="na">length</span> <span class="o">&gt;</span> <span class="mi">0</span>
+      <span class="k">try</span>
+        <span class="nx">sc</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="nx">mkString</span><span class="p">(</span><span class="nx">ns</span><span class="p">,</span> <span class="p">[</span><span class="s">','</span><span class="p">,</span> <span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">]))</span>
+        <span class="nx">fail</span>
+      <span class="k">catch</span> <span class="nx">error</span>
+        <span class="nx">error</span><span class="p">.</span><span class="na">should</span><span class="p">.</span><span class="na">equal</span><span class="p">(</span><span class="s">'Negatives not allowed: '</span> <span class="o">+</span> <span class="nx">ns</span><span class="p">.</span><span class="na">filter</span><span class="p">((</span><span class="nx">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">).</span><span class="na">join</span><span class="p">(</span><span class="s">','</span><span class="p">))</span>
+  <span class="p">)</span>
+</code></pre>
+
+<p>For the final test, confirming that negative numbers will result in an exception, no further functions needed to be defined to facilitate the test.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Oddly enough in my Scala code I don't use ScalaTest for property based testing anymore as it adds a layer of indirection which at times leaves me a little confused groping through the source to try and understand what actually went wrong.</p>
+
+<p>As a further exercise I used a similar approach whilst performing the <a href="https://github.com/graeme-lockley/string-calculator-java8-pbt">kata in Java 8</a>.  More recently I was creating some value objects in Java 6 and found myself wanting to generate value objects to validate methods over these objects.  I then completed the <a href="https://github.com/graeme-lockley/string-calculator-java6-pbt">kata</a> using Java 6 as an exercise to evolve the PBT boilerplate and see what the tests would look like without lambdas and real closures. Like before, I was amazed at the simplicity and readability of the resulting tests.  As I still write loads of Java 6 and Java 7 code I have taken the learnings from the Java 6 kata and dropped them into a library which I've placed on <a href="https://github.com/graeme-lockley/pbt-java6">github</a> and is accessible through a maven repo.</p>
+
+<p>In all circumstances I was surprised at how simple it was to create property based tests.</p>
+
+<p>As a final note about PBT - it is making me a better developer.  When I started doing TDD I became a better developer because I needed to think harder how to isolate components in order to make them testable.  This forced me to layer my applications better and segregate responsibilities more clearly. PBT has forced me to understand my language and libraries better as it has a tendency to expose boundary conditions where I have been loose.</p>
+
+
+          
+          <hr>
+          <a href="https://twitter.com/share" class="twitter-share-button">Tweet</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+          <div class="fb-like" data-href="https://graeme-lockley.github.io/posts/20160201-coffeescript_string_calculator_with_predicate_tests/" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div>
+            <!-- posts/20160201-coffeescript_string_calculator_with_predicate_tests.html -->
+          
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2017 <a href="https://github.com/graeme-lockley">Ideas in Software</a></p>
+    </div>
+  </footer>
+
+  <script src="/assets/javascripts/application-b1079a0e.js" type="text/javascript"></script>
+  
+</body>
+</html>
