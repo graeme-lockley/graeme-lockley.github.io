@@ -355,7 +355,7 @@ The categorical error of the anesthesia era — "this will never be safe enough"
 
 Before examining how individuals and teams evolve through this transition, it is worth pausing to consider what the work itself is becoming. This is not merely "coding with AI assistance" in the way that a carpenter might use a power saw instead of a hand saw — doing the same work faster. The nature of the activity is changing.
 
-### 9.1 From Composition to Direction
+### From Composition to Direction
 
 Traditional software development is fundamentally compositional. The developer thinks through a problem, designs a solution, and writes code to implement it — line by line, function by function, the artifact emerging from the developer's mind through their hands. It is, in this sense, a craft of making. The developer is author and composer.
 
@@ -363,7 +363,7 @@ At higher stages of AI-assisted development, the work shifts from composition to
 
 The parallel to surgery is instructive. Before anesthesia, the surgeon's hands were the instrument — every cut deliberate, every motion trained over years of practice. When anesthesia arrived and, later, when teams and technology expanded the operating theatre, the senior surgeon's role shifted from sole performer to director of an ensemble: guiding junior surgeons, coordinating with anesthesiologists, interpreting diagnostic information. The manual skill did not become irrelevant, but it was joined — and eventually subordinated — by the skill of orchestration.
 
-### 9.2 From Serial to Parallel
+### From Serial to Parallel
 
 Traditional development is largely serial. A developer works on one problem, completes it or reaches a stopping point, then moves to the next. Deep focus on a single problem is valued. Flow states — extended periods of uninterrupted concentration — are prized and protected by teams that understand their importance.
 
@@ -371,7 +371,7 @@ At higher stages, work becomes parallel. Multiple AI agents work simultaneously 
 
 The weaver at a single loom knew every thread intimately. The factory foreman overseeing fifty looms knew none of them that way — but understood something the weaver did not: how the whole operation fitted together, where bottlenecks formed, which machines needed attention. It was a different kind of expertise, not lesser but genuinely different. Some weavers became excellent foremen. Others never adapted to the breadth of attention the new role demanded.
 
-### 9.3 From Understanding to Verification
+### From Understanding to Verification
 
 Traditional development emphasises deep understanding. A developer is expected to comprehend every line of code they produce, to explain why each decision was made, to debug any problem that emerges. "I don't understand how this works" is an uncomfortable admission for any professional, but especially for one whose professional identity rests on understanding complex systems.
 
@@ -379,7 +379,7 @@ At higher stages, understanding gives way to verification. The practitioner may 
 
 Trithemius, the abbot who defended scribes against the printing press, would have recognised this anxiety. The scribe understood every word he copied — he was scholar as much as copyist, catching errors, annotating margins, bringing knowledge of textual tradition to every page. The publisher who verified printed output against a manuscript was performing a different act: checking correspondence, not understanding content. It was more efficient and less intimate. Something was gained in reach; something was lost in depth.
 
-### 9.4 From Maker to Evaluator
+### From Maker to Evaluator
 
 Perhaps the most consequential shift is from creation to assessment. Traditional development is creative work. The developer makes things — designs, implements, brings something into existence that was not there before. This act of creation is often a source of deep satisfaction: the flow state of writing clean code, the elegance of a well-designed abstraction, the quiet pleasure of a program that runs correctly on the first attempt.
 
@@ -387,7 +387,7 @@ At higher stages, the work shifts toward evaluation. The practitioner prompts, w
 
 The British Musicians' Union sensed something similar in 1984 when they tried to ban synthesisers. A session musician who had spent decades mastering the oboe was not merely losing work to a keyboard player pressing buttons. He was losing the experience of playing — the breath control, the embouchure, the physical relationship with the instrument that was inseparable from the music itself. The synthesiser player produced acceptable sound. The oboist had produced it through his body. Whether the audience noticed the difference was, in a sense, beside the point.
 
-### 9.5 What This Means
+### What This Means
 
 These four shifts — composition to direction, serial to parallel, understanding to verification, making to evaluating — do not merely augment existing practice. They constitute a transformation of it. And this has implications that run deeper than workflow or productivity.
 
@@ -397,7 +397,15 @@ Some practitioners will not thrive in the transformed practice. This is not a re
 
 ---
 
-## 10. The Eight Stages
+## Stages and Levels
+
+A crucial premise underlies what follows: **value is delivered through teams of people working together toward agreed outcomes.** Individual skill matters because it contributes to team capability. Team capability matters because it enables value delivery. Neither exists in isolation.
+
+Consider a rugby team. Individual skills matter enormously — passing accuracy, tackling technique, positional awareness, fitness. But a team of individually brilliant players who cannot coordinate will lose to a team of competent players who work together effectively. The scrum requires eight individuals to bind and push as one. The lineout requires precise timing between thrower, jumper, and lifters. The backline move requires each player to run the right line at the right moment. At the same time, no amount of coordination can compensate for players who lack fundamental skills. A team with perfect set-piece plays but players who cannot catch will fail. Individual capability is the foundation; team coordination amplifies it.
+
+The same dynamic applies to AI-assisted development. Individual practitioners must develop new skills—prompting effectively, evaluating AI output, operating at higher stages—but they must also coordinate: sharing context, avoiding duplication, maintaining architectural coherence, managing costs collectively. Neither dimension alone is sufficient.
+
+### The Eight Stages
 
 Steve Yegge — a veteran of thirteen years at Google and six at Amazon, known for long-form essays that the industry treats as manifestos — published ["Welcome to Gas Town"](https://steve-yegge.medium.com/welcome-to-gas-town-4f25ee16dd04) in January 2026. The essay is characteristic Yegge: sprawling, opinionated, and uncomfortably prescient. Its central claim is that development has shifted from typing to orchestration, and that most of the industry has not noticed.
 
@@ -405,7 +413,7 @@ Yegge describes a progression through eight stages of individual AI adoption, ea
 
 What follows draws on Yegge's framework, adapted and contextualised for the broader argument of this essay.
 
-### 10.1 The Early Stages: Assistance
+### The Early Stages: Assistance
 
 The first three stages represent what most developers currently experience. At **Stage 1**, AI is a reference tool — occasional code completion, the odd question to a chatbot. The developer writes all code themselves. The experience is not fundamentally different from using Stack Overflow or an API reference.
 
@@ -413,15 +421,15 @@ At **Stage 2**, a coding agent operates in the IDE sidebar, requesting permissio
 
 **Stage 3** is what Yegge calls "YOLO mode" — permissions are switched off, and the agent executes without pre-approval. This is a psychological threshold more than a technical one. The developer has accumulated enough experience to trust the agent's judgment in routine cases and intervene only when problems emerge. It is analogous to the moment a surgeon first allows an anesthesiologist to manage the patient without being asked to approve each dose.
 
-### 10.2 The Middle Stages: Transformation
+### The Middle Stages: Transformation
 
 Stages 4 and 5 are where the nature of the work begins to change. At **Stage 4**, the agent's output becomes the primary view. The developer stops looking at code being written and begins looking at diffs — reviewing what was produced rather than producing it. Yegge describes the agent "filling the screen": the code is there, but the developer's relationship to it has shifted from author to editor.
 
 At **Stage 5**, work moves from the IDE to the command line. The agent operates with full autonomy across the codebase. The developer's screen shows diffs scrolling past — some examined carefully, some glanced at, some not reviewed at all. The IDE, for decades the centre of the developer's working life, becomes a secondary tool.
 
-These middle stages are where the identity questions begin to bite. A developer at Stage 2 is still writing code, with AI helping. A developer at Stage 5 is directing agents and evaluating output. The work is recognisably different. It is at this transition that the resistance patterns described in Part III most often surface — not at the entry point where AI is merely a convenience, but at the inflection point where it transforms the role.
+These middle stages are where the identity questions begin to bite. A developer at Stage 2 is still writing code, with AI helping. A developer at Stage 5 is directing agents and evaluating output. The work is recognisably different. It is at this transition that the resistance patterns described earlier most often surface — not at the entry point where AI is merely a convenience, but at the inflection point where it transforms the role.
 
-### 10.3 The Later Stages: Orchestration
+### The Later Stages: Orchestration
 
 **Stage 6** introduces parallelism: three to five agent instances running concurrently on different tasks. Throughput increases dramatically. The developer's role becomes coordination — tracking multiple work streams, resolving conflicts between them, deciding which output to review carefully and which to accept on trust.
 
@@ -429,7 +437,7 @@ These middle stages are where the identity questions begin to bite. A developer 
 
 And then there is **Stage 8** — what Yegge calls "Gas Town" itself. The practitioner builds or uses orchestration systems that coordinate the agents automatically: automated handoffs, merge queues, supervision agents that monitor other agents. Yegge describes merging forty-four thousand lines of code that no human reviewed, managed overnight by what he calls "PR Sheriffs." The practitioner at this stage does not manage code or even manage agents. They manage the system that manages the agents that produce the code. It is, as Yegge puts it, a refinery — and the developer is running it.
 
-### 10.4 The Uneven Journey
+### The Uneven Journey
 
 The temptation is to read these stages as a ladder: higher is better, and everyone should climb. That reading is mistaken in several ways.
 
@@ -437,17 +445,15 @@ First, different work suits different stages. A genuinely novel architectural ch
 
 Second, temperament matters. Some practitioners thrive in the parallel, evaluative mode of higher stages — the rapid context-switching, the breadth of attention, the tolerance for imperfect output. Others find deep satisfaction in the compositional, focused mode of traditional work. The developer who enters flow state while crafting an elegant algorithm is not inferior to the developer managing fifteen agents. They are suited to different work.
 
-Third, infrastructure constrains progression. A practitioner cannot sustainably operate at Stage 6 or above without organisational support: cost management, merge coordination, governance. The individual and the team must evolve together — which is the subject of the next section.
+Third, infrastructure constrains progression. A practitioner cannot sustainably operate at Stage 6 or above without organisational support: cost management, merge coordination, governance. The individual and the team must evolve together—which the following levels make explicit.
 
----
-
-## 11. The Five Levels
+### The Five Levels
 
 Yegge's framework describes how individuals progress. But individuals do not work alone, and organisational infrastructure either enables or constrains what individuals can do. Siddhant Khare — a software engineer at Ona and core maintainer of OpenFGA, the CNCF's fine-grained authorisation project — addresses this gap in [*The Agentic Engineering Guide*](https://agents.siddhantkhare.com/), published in early 2026. His ["Agent Maturity Model"](https://agents.siddhantkhare.com/22-agent-maturity-model/) describes not individual skill but collective capability: the infrastructure, policies, and coordination mechanisms that determine what AI-assisted work an organisation can sustain.
 
 Khare's central insight is disarmingly simple: **maturity is defined by your weakest dimension, not your most advanced capability.** A team with sophisticated agent orchestration but no security policies is not a mature team. They are a liability. The model is not a ladder to be climbed but a set of interlocking capabilities that must develop together.
 
-### 11.1 From Shadow IT to Infrastructure
+### From Shadow IT to Infrastructure
 
 The first two levels describe what most organisations experience today. At **Level 1 — Experimentation** — individual engineers try AI tools on their own initiative. There are no team standards, no security policies, no cost tracking. Usage is invisible to the organisation. It is, in effect, shadow IT — and like all shadow IT, it carries risks that compound the longer it goes unacknowledged.
 
@@ -455,7 +461,7 @@ The first two levels describe what most organisations experience today. At **Lev
 
 The transition from Level 1 to Level 2 is straightforward: provide licensed tools, create channels for sharing, track usage without mandating it. Most organisations that have "adopted AI" have reached this point and declared victory. Khare argues they have barely begun.
 
-### 11.2 The Infrastructure Threshold
+### The Infrastructure Threshold
 
 **Level 3 — Team Integration** — is where the character of the transformation changes. At this level, the organisation begins building infrastructure specifically for AI-assisted work: context files in repositories that give agents project-specific guidance, internal APIs exposed through tool servers so agents can interact with proprietary systems, review guidelines for AI-assisted code, and cost tracking to make the economics visible.
 
@@ -463,7 +469,7 @@ This is the level at which AI tools stop being individual productivity aids and 
 
 The historical parallel is suggestive. When spreadsheets first appeared, individual accountants used them to speed up their own calculations — but the transformation of accounting happened when firms standardised templates, built shared models, and created review processes for spreadsheet work. The tool became infrastructure. The same transition is happening now.
 
-### 11.3 Orchestration and Autonomy
+### Orchestration and Autonomy
 
 **Level 4 — Orchestration** — deploys multi-agent workflows with formal governance: authorisation systems controlling what agents can access, observability and tracing to make agent activity visible, documented policies, cost budgets with alerts. This is the level that enables individual practitioners to operate at Stages 5 through 7. Without it, advanced individual practice is unsustainable — brilliant cowboys riding without fences.
 
@@ -471,7 +477,7 @@ The historical parallel is suggestive. When spreadsheets first appeared, individ
 
 Few organisations have reached Level 5. It requires not just technical infrastructure but a fundamental shift in how the organisation thinks about trust, accountability, and verification. It is, in Khare's framing, the point at which the organisation has genuinely transformed — not merely adopted tools but changed how it works.
 
-### 11.4 The Maturity Trap
+### The Maturity Trap
 
 Khare identifies a pattern he calls the "maturity trap": organisations that try to skip levels, jumping from Level 2 individual use to Level 4 orchestration without building the Level 3 infrastructure of context files, integrated APIs, and review guidelines. The result is brittle and unmanageable — sophisticated agent workflows running against codebases the agents do not understand, producing output that no one has established standards for reviewing.
 
@@ -479,21 +485,13 @@ The temptation to skip is understandable. Level 3 work — writing context files
 
 Attempting to skip levels recalls the textile manufacturers who bought power looms before establishing the factory systems to support them. The machinery was impressive. Without maintenance schedules, quality inspection, and coordination of workers, it was also unreliable and dangerous. Infrastructure precedes capability, in software as in manufacturing.
 
----
+### Limitations of These Frameworks
 
-## 12. The Interdependence
+Both frameworks are experiential taxonomies from individual practitioners, not empirically validated models. Yegge's stages are drawn from his personal journey and observations; Khare's levels from his experience with a single organisation and open-source project. Neither has been tested across a broad population. The stage and level boundaries are somewhat arbitrary—the distinction between Stage 6 and Stage 7, for instance, is a matter of degree (number of concurrent agents) rather than a qualitative shift. Whether eight stages is the right decomposition is an open question.
 
-The individual and team dimensions described in the previous two sections are not independent tracks to be managed separately. They are aspects of a single transformation, and they must evolve together.
+No competing frameworks of comparable specificity have yet emerged in the public discourse. That makes Yegge and Khare useful as vocabulary and rough navigational aids—the best available maps of territory that is still being explored—rather than as validated progressions that practitioners should expect to follow sequentially. The frameworks may also reflect a bias toward the orchestration end of the spectrum: both authors are enthusiastic advanced adopters, and their framing implicitly treats higher stages and levels as more desirable. The point made earlier about temperament and fit is a necessary counterweight. Not everyone should climb to Stage 8; not every team should aim for Level 5.
 
-### 12.1 The Rugby Analogy
-
-Consider a rugby team. Individual skills matter enormously — passing accuracy, tackling technique, positional awareness, fitness. But a team of individually brilliant players who cannot coordinate will lose to a team of competent players who work together effectively. The scrum requires eight individuals to bind and push as one. The lineout requires precise timing between thrower, jumper, and lifters. The backline move requires each player to run the right line at the right moment.
-
-At the same time, no amount of coordination can compensate for players who lack fundamental skills. A team with perfect set-piece plays but players who cannot catch will fail. Individual capability is the foundation; team coordination amplifies it.
-
-The same dynamic applies to AI-assisted development. Individual practitioners must develop the skills described in Yegge's stages — prompting effectively, evaluating output, operating in parallel, orchestrating agents. But they must also coordinate: sharing context, avoiding duplication, maintaining architectural coherence, managing costs collectively. Neither dimension alone is sufficient.
-
-### 12.2 When the Dimensions Diverge
+### When the Dimensions Diverge
 
 When individual skill and team infrastructure evolve out of alignment, the results are predictable and painful.
 
@@ -505,7 +503,7 @@ The second failure mode is the reverse: sophisticated team infrastructure with p
 
 This is the team with an elaborate playbook and players who cannot execute it. The theory is sophisticated; the practice is basic.
 
-### 12.3 Developing Together
+### Developing Together
 
 Effective transformation develops both dimensions in concert. Team infrastructure should lead individual capability by roughly one level, ensuring support exists when practitioners are ready to progress. Pioneers — those who advance faster — should be supported without requiring everyone to match their pace. And progression should be pulled by demonstrated value rather than pushed by management enthusiasm.
 
@@ -515,17 +513,17 @@ The team is the unit that delivers value. Individual skill matters because it co
 
 ---
 
-## 13. The Human Cost
+## The Human Cost
 
 The transformation of practice creates genuine difficulties that deserve honest acknowledgment rather than corporate optimism. Siddhant Khare's essay ["AI Fatigue Is Real"](https://siddhantkhare.com/writing/ai-fatigue-is-real), which reached the top of Hacker News in February 2026, struck a nerve because it named something many practitioners were feeling but few had articulated: the paradox that AI makes individual tasks faster while making days harder.
 
-### 13.1 The Productivity Paradox
+### The Productivity Paradox
 
 The explanation is straightforward. When each task takes less time, more tasks fill the day. Capacity appears to expand, so expectations expand to match. A developer who once spent a full day on one design problem might now touch six problems in a day, each "only taking an hour with AI."
 
 But context-switching between six problems is cognitively expensive. The AI does not tire between problems. The human does. AI reduces the cost of production while increasing the cost of coordination, review, and decision-making. Those costs fall entirely on the human.
 
-### 13.2 The Loss of the Meditative Middle
+### The Loss of the Meditative Middle
 
 Khare identifies something subtler that resonates with many practitioners: the loss of what he calls the "meditative middle." Traditional coding has three cognitive modes — stressful problem-solving at the outset, meditative implementation in the middle, and the satisfaction of completion at the end. The middle phase, where the developer translates an understood solution into code, is not merely productive. It is restorative. The fingers move; the mind settles; the work has a rhythm.
 
@@ -533,25 +531,25 @@ AI collapses this middle phase. The hard decisions remain — what to build, how
 
 Engineers describe this as being "tired but not sure why" — a state Khare attributes to executive functioning fatigue. The prefrontal cortex, which handles judgment and decision-making, runs at full load all day. The breaks it used to get during routine implementation have been automated away.
 
-### 13.3 From Maker to Evaluator
+### From Maker to Evaluator
 
 The shift from maker to evaluator, described earlier, has a cost that the productivity framing obscures. With heavy AI assistance, the developer's day increasingly becomes: prompt, wait, read output, evaluate correctness, evaluate safety, evaluate architectural fit, fix inadequacies, re-prompt, repeat. The developer becomes a quality inspector on an assembly line that runs at whatever speed the AI can produce. Creating generates flow states and energy; evaluating generates decision fatigue and depletion.
 
 A further complication: AI-generated code often requires more careful review than a colleague's work. When reviewing a colleague's pull request, the reviewer knows their patterns, strengths, and blind spots. With AI, every line is potentially suspect. The reviewer cannot rely on the author's reputation or track record, because the author has neither.
 
-### 13.4 Nondeterminism
+### Nondeterminism
 
 Engineers are trained on determinism. Same input, same output. This principle makes debugging possible, makes systems reasonable, makes professional confidence well-founded. AI breaks this contract. A prompt that worked Monday produces different results Tuesday. There is no stack trace explaining why the model chose differently.
 
 For practitioners whose careers are built on "if it broke, I can figure out why," this nondeterminism creates a persistent low-level discomfort. You cannot fully trust output. You cannot fully predict behaviour. You cannot fully relax. The professional identity built on understanding systems encounters a system that resists being understood.
 
-### 13.5 The Skills Mismatch
+### The Skills Mismatch
 
 The traits that made someone excellent at traditional development may work against them in AI-augmented work. Deep focus on a single problem — the ability to hold a complex system in working memory for hours — becomes less valuable when the work demands rapid switching between multiple agent streams. Perfectionism, which once produced elegant code, becomes a liability when "good enough" output arrives in minutes and perfecting it takes hours. Deterministic thinking, the hallmark of engineering rigour, encounters probabilistic output that cannot be reasoned about with the same tools.
 
 This is not a judgment about which traits are superior. It is a statement about fit. The role has changed, and some people's characteristics suit the new role better than others.
 
-### 13.6 What This Means for Teams
+### What This Means for Teams
 
 These human costs have collective implications that thoughtful leaders cannot ignore. Not everyone will progress to Stage 6 or beyond, and not everyone should. Stage 3 or 4 might be the appropriate ceiling for excellent practitioners whose temperament does not suit the evaluative, parallel mode of higher stages — and that ceiling should be respected, not treated as a failure.
 
@@ -561,65 +559,7 @@ And there is a harder truth: if the practice has genuinely transformed and someo
 
 ---
 
-# Part V: Navigating the Transition
-
-## 14. A Framework for Change
-
-How should an organisation navigate a transformation that affects individual skill, team infrastructure, professional identity, and the nature of the work itself? The historical cases suggest that the transition will happen regardless of how it is managed — the question is whether it happens well or badly, and how much unnecessary damage accumulates along the way.
-
-### 14.1 Principles
-
-Several principles emerge from the patterns examined throughout this essay.
-
-The first is that **value flows through teams.** The goal is not to create AI-augmented individuals but AI-augmented teams that deliver outcomes. Yegge's eight stages describe individual progression; Khare's five levels describe team infrastructure. Neither dimension alone produces value. An organisation of Stage 7 individuals in a Level 2 environment is a collection of brilliant cowboys. A Level 5 environment staffed by Stage 2 practitioners is an empty cathedral. The dimensions must evolve together, with team infrastructure leading individual progression by roughly one level.
-
-The second is that **resistance is not one thing**, and treating it as such wastes effort while alienating the people most worth keeping. Rational caution deserves guardrails. Stale caution deserves fresh experience. Identity-based resistance deserves acknowledgment and time. Applying the wrong intervention — arguing with rational caution, respecting stale caution as current, presenting evidence to someone in identity crisis — makes things worse.
-
-The third is that **the transformation has genuine costs**, and pretending otherwise destroys trust. AI fatigue is real. The shift from maker to evaluator does not suit everyone. Some excellent developers will not thrive in the transformed role. Leaders who acknowledge these costs honestly earn the credibility to lead through them. Leaders who promise that "nothing fundamental is changing" lose credibility the moment practitioners discover otherwise.
-
-The fourth is that **augmentation, not replacement, must be the lived experience**, not merely the talking point. If practitioners experience AI adoption as a headcount reduction tool, resistance becomes rational regardless of what leadership says. The constraint in most organisations is not excess people but excess work. AI should be directed at the constraint.
-
-### 14.2 What Leaders Get Wrong
-
-The most common failure is treating adoption as a procurement problem: buy tools, roll them out, measure adoption rates, declare success. This misses everything that matters.
-
-Leaders who say "we need to improve productivity by X per cent" signal that the point is doing more with fewer people — and every practitioner hears the subtext. Leaders who say "this is the future and everyone needs to get on board" dismiss legitimate concerns and trigger identity resistance. Leaders who point to competitors — "other companies are adopting rapidly" — create pressure without addressing substance.
-
-What works is different. "We are exploring how AI can remove tedious work and let you focus on harder problems" — this frames adoption as augmentation, not displacement. "Your expertise is essential for guiding AI output and catching its limitations" — this positions the practitioner's existing skill as the safety net, not the thing being replaced. "We will measure success by quality and experience, not just velocity" — this signals that the organisation values what practitioners value.
-
-And when the costs are real — the fatigue, the identity disruption, the discomfort of nondeterminism — leaders must name them: "AI can change work in ways that are tiring for some people. That is real. If you are producing more but feeling more depleted, that experience is valid. Different work styles suit different people. There is no shame in finding your appropriate level."
-
-### 14.3 Common Objections and Honest Responses
-
-Certain objections recur in every organisation navigating this transition, and they deserve thoughtful engagement rather than dismissal.
-
-"We are moving too slowly" is often heard from enthusiasts and management alike. Speed of adoption is not equivalent to quality of adoption, and mandating rapid uptake without addressing concerns creates technical debt, resentment, and vulnerabilities. But organisations should honestly assess their position. If competitors operate at higher stages and levels, "sustainable pace" may be a polite name for falling behind.
-
-"The sceptics are simply resistant to change" flatters leadership's patience while mischaracterising the situation. Some sceptics may indeed be resistant in a categorical sense. Many are not. The burden is on leadership to distinguish rational caution from stale caution from identity-based resistance, and to address each appropriately. Labelling all scepticism as resistance is the organisational equivalent of the Viennese medical establishment dismissing Semmelweis: it protects the ego of the decision-makers at the cost of the insight the sceptics carry.
-
-"We need to mandate adoption" misunderstands the nature of the tools. Mandates backfire for tools that require judgment. A developer forced to use AI they do not trust will either accept suggestions uncritically — introducing precisely the quality risks that sceptics warned about — or review so carefully that productivity decreases. What organisations can mandate is infrastructure: context files, cost tracking, review guidelines. Build capability and let people use it when they are ready.
-
-"Junior engineers are adopting faster; senior engineers are the problem" is true on the surface and misleading underneath. Junior engineers have less to unlearn, which accelerates adoption. They also have less ability to recognise when AI is subtly wrong, which makes their adoption riskier. Faster adoption is not inherently better. The senior engineer's caution, when it is rational rather than stale, is a quality assurance mechanism that the organisation cannot afford to dismiss.
-
-### 14.4 Different Roles, Different Trajectories
-
-Not every role follows the same path, and frameworks that assume uniform progression mislead.
-
-Software developers have the highest potential ceiling — some will reach Stage 8 — but also the most significant identity investment and therefore the greatest potential for resistance. The priority is supporting voluntary progression while respecting the evolution of craft, not demanding that everyone become an orchestrator.
-
-DevOps and platform engineers bring strong rational caution about production systems, and that caution deserves respect. The appropriate approach is guardrails for production environments with freedom to experiment elsewhere. Security-conscious resistance in this role is almost always rational, not stale.
-
-Testers and QA engineers face a bifurcated trajectory: automation engineers often progress faster, while exploratory testers may find that AI handles the rote work they once did, freeing them for the creative testing that machines still cannot replicate.
-
-Business and systems analysts, who often face less identity resistance because their primary skill is interpretation rather than implementation, tend to adopt for drafting and synthesis tasks with relatively little friction.
-
-Product managers are frequently the earliest adopters — their work involves synthesis, documentation, and communication, all areas where AI provides clear productivity gains with minimal identity threat.
-
----
-
-# Part VI: Conclusion
-
-## 15. Conclusion
+## Conclusion
 
 The resistance of experienced software developers to AI-assisted tools is not a failure of imagination or a character flaw. It is a predictable pattern that has recurred across every major technological transformation in the historical record.
 
@@ -634,6 +574,8 @@ Beyond resistance, the practice itself is transforming. As Yegge's framework ill
 The transformation has genuine human costs. AI fatigue, the loss of creative satisfaction, the skills mismatch between traditional and transformed practice — these are real and deserve honest acknowledgment. Not everyone will thrive in the transformed role. Some excellent developers, whose skills are superbly adapted to a mode of work that is changing around them, will find themselves in the position of the master weavers of 1811: not lacking in talent, but possessing talent for a world that is passing.
 
 The future of software development is not AI replacing developers. It is AI-augmented teams — teams where individual skills and collective capability combine to deliver outcomes that neither could achieve alone. The practitioners who resist most strongly today may become sophisticated users tomorrow, if their concerns are respected, their expertise valued, and they receive support in evolving. Some will not make the transition. That is honest reality, and it deserves honest acknowledgment.
+
+Several implications for organisations follow. Value flows through teams, not isolated individuals; neither Yegge's stages nor Khare's levels suffice alone. Resistance is not one thing—rational caution, stale caution, and identity-based resistance each demand a different response. The transformation has genuine costs, and pretending otherwise destroys trust. And augmentation, not replacement, must be the lived experience if adoption is to succeed. How organisations put these into practice—what leaders say and do, how they address common objections, how they support different roles—is a topic for separate treatment.
 
 History suggests the technology will prevail regardless of resistance. The question is not whether but how — and whether we navigate the transition with more wisdom than the Viennese medical establishment showed Semmelweis, or the British government showed the Luddites.
 
