@@ -3,7 +3,7 @@ languageCode = "en-us"
 title = "Ideas in Software"
 
 [permalinks]
-  posts = "/posts/:contentbasename/"
+  posts = "/posts/:filename/"
 
 [params]
   description = "Thoughts on software design, principles, and craft"
