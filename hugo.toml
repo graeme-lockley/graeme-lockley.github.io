@@ -1,9 +1,9 @@
-baseURL = "https://graeme-lockley.github.io/ideas-in-software/"
+baseURL = "https://graeme-lockley.github.io/"
 languageCode = "en-us"
 title = "Ideas in Software"
 
 [permalinks]
-  posts = "/posts/:filename/"
+  posts = "/:filename/"
 
 [params]
   description = "Thoughts on software design, principles, and craft"
