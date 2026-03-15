@@ -1,0 +1,23 @@
+baseURL = "https://graeme-lockley.github.io/ideas-in-software/"
+languageCode = "en-us"
+title = "Ideas in Software"
+
+[permalinks]
+  posts = "/posts/:contentbasename/"
+
+[params]
+  description = "Thoughts on software design, principles, and craft"
+  author = "Graeme Lockley"
+
+[build]
+  writeStats = true
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = false
+  [markup.highlight]
+    style = "github"
+
+[taxonomies]
+  tag = "tags"
