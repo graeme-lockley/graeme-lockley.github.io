@@ -354,5 +354,3 @@ Recognizing this shift is a prerequisite for any meaningful response. The more p
 If the argument developed here is correct, intelligence has always been in the network. What has changed is the infrastructure for it to organise itself—and agents can now be observed exhibiting behaviours that parallel what humans did when given similar infrastructure. The same pattern, applied to a new substrate.
 
 Whether such emergence is already underway is a question that current frameworks are not equipped to answer—and that may itself be the most important observation this essay can offer.
-
----
