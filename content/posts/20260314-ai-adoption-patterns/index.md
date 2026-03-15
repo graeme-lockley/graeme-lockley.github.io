@@ -1,7 +1,7 @@
 ---
-title: "Adoption Patterns of AI-Assisted Software Development Tools"
+title: "Why the Best Developers Resist Longest"
 date: 2026-03-14
-description: "Historical precedents and change management strategies"
+description: "Lessons from surgeons, weavers, and scribes on what happens when craft meets machine"
 tags: ["ai", "software-development", "change-management", "history"]
 draft: false
 ---
