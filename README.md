@@ -29,4 +29,4 @@ Pushing to `main` automatically deploys via GitHub Actions. The site is availabl
 
 ## Credits
 
-Theme: [PaperMod](https://github.com/adityatelange/hugo-PaperMod)
+Custom design - hand-crafted CSS and layouts in `assets/css/` and `layouts/`.
