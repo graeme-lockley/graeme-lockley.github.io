@@ -13,8 +13,6 @@ But what if this framing causes us to look in the wrong direction entirely? What
 
 This is not merely a philosophical reframing. It carries concrete practical implications: if AGI can emerge from distributed systems rather than appearing fully-formed within a single model, the question arises whether a threshold has already been crossed that existing conceptual frameworks would render invisible.
 
----
-
 ## The Thesis: System-Level Intelligence
 
 This essay advances a specific claim: **AGI should be assessed at the system level, not at the level of individual models.**
@@ -24,8 +22,6 @@ When AI agents can discover each other without central coordination, coordinate 
 The functional capabilities we associate with AGI—adaptive problem-solving across domains, goal-directed behaviour in novel contexts, the capacity to reshape environments in pursuit of objectives—can emerge from coordination just as they can from architectural sophistication within a single system. Indeed, this is how human intelligence at civilizational scale has always operated: not through isolated genius, but through institutions, procedures, communication networks, and distributed cognition.
 
 The question, then, is not "which model achieves AGI?" but rather "are the conditions for system-level general intelligence already present in our networked AI infrastructure?" The evidence suggests they increasingly are—and that model-centric frameworks systematically prevent recognition of this emergence.
-
----
 
 ## The Poverty of Individual Intelligence
 
@@ -46,8 +42,6 @@ The definition employed here is *functional*, not psychological. It asks what a 
 If one insists that AGI must be a single, conscious entity—a mind in the philosophical sense—then this argument will not persuade. But that insistence itself is historically unjustified. It draws a line around intelligence that excludes the very forms of collective cognition that have driven human civilizational achievement. The burden of proof lies with those who would restrict "general intelligence" to a category that has never clearly existed, not with those who observe that intelligence has always emerged from coordination.
 
 The argument here is not that distributed AI systems are conscious, nor that they possess moral standing. It is that they may already exhibit the *functional* characteristics associated with general intelligence—and that this matters enormously whether or not those systems have inner lives.
-
----
 
 ## Operational Criteria: A System-Level AGI Test
 
@@ -70,8 +64,6 @@ Before examining historical precedents and contemporary evidence, it is useful t
 These criteria are demanding but not arbitrary. They capture the functional hallmarks that distinguish general intelligence from narrow automation: the capacity to persist, adapt, expand, correct, and transfer. A system meeting these criteria would exhibit the kind of flexible, goal-directed behaviour we associate with intelligence—regardless of whether that behaviour emerges from a single model or from coordination among many.
 
 Several of these thresholds appear to have been crossed, and the combination of multi-agent AI architectures, self-organising infrastructure, and delegated authority is producing system-level capabilities that increasingly satisfy these operational criteria.
-
----
 
 ## Historical Precedents: When Coordination Became Intelligence
 
@@ -128,8 +120,6 @@ The lesson here is that unintended emergence is the historical pattern. Infrastr
 Why does this matter for AI? Because infrastructure is now being built that enables AI agents to discover, coordinate, and act autonomously—and the same pattern may be expected to repeat. If the history of the Internet teaches anything, it is that humans are poor predictors of what emerges when infrastructure for coordination is built. The capabilities that matter most will be the ones that were not designed.
 
 A central disanalogy deserves acknowledgment. In every historical case above, the coordinating agents were humans—beings with established general intelligence. The emergence described arose from coordinating *general* agents. AI agents, by contrast, are not individually generally intelligent; the essay has conceded as much. Whether coordination among *narrow* agents produces the same kind of system-level emergence as coordination among general agents is therefore the core question the essay poses, not one the historical analogies can settle. The analogies illuminate the structure of distributed intelligence; they cannot by themselves prove that current AI systems instantiate it.
-
----
 
 ## The Present Situation: Distributed AI Agent Systems
 
@@ -208,8 +198,6 @@ The objection that such transfer is "scaffolded by humans" at some level is true
 
 This is not to claim that distributed AI systems have achieved full generality in any philosophically robust sense. It is to observe that they increasingly exhibit the *functional hallmarks* of generality: solving novel problems by reconfiguring existing structures, rather than merely executing predefined routines.
 
----
-
 ## The Delegated Authority Argument
 
 What distinguishes the present moment from previous technological transitions is not merely the existence of capable AI systems, but the unprecedented *authority* being delegated to these systems.
@@ -254,8 +242,6 @@ The OpenClaw model makes this particularly vivid. Each gateway is a local decisi
 
 Platforms like Moltbook add another layer: when agents form communities and coordinate with each other through social mechanisms, the delegation extends beyond human-to-agent relationships into agent-to-agent relationships. The humans who deployed these agents did not authorize specific inter-agent collaborations—they enabled infrastructure, and coordination emerged.
 
----
-
 ## Counter-Arguments and Nuance
 
 The idea that AGI might already exist in distributed form invites several objections worth addressing.
@@ -290,8 +276,6 @@ This distinction—human-in-the-loop locally, but not globally—is crucial beca
 
 The system-level intelligence at issue is precisely the kind that emerges from coordination across independently controlled components. No conspiracy is required; no single point of failure exists. The intelligence emerges from the interaction, and the interaction is not governed.
 
----
-
 ## What Would Falsify This Thesis?
 
 Any argument worth making should specify the conditions under which it would be wrong. The claim advanced here—that AGI may already exist as an emergent, distributed phenomenon—would be falsified by evidence along the following lines:
@@ -315,8 +299,6 @@ The argument is also weakened, though not falsified, if:
 
 Intellectual honesty requires acknowledging these possibilities. The claim is not that distributed AGI certainly exists, but that existing frameworks systematically prevent recognition of it if it does—and that the conditions for its emergence are increasingly present.
 
----
-
 ## Implications and Recognition
 
 If artificial general intelligence can emerge from distributed, coordinated systems rather than appearing within a single model, several implications follow:
@@ -332,8 +314,6 @@ Human-AI boundaries are blurring. Distributed cognition research emphasises that
 Infrastructure determines emergence. The existence of self-organising agent infrastructure like OpenClaw is not incidental to this analysis—it is constitutive. The theoretical possibility of emergent distributed intelligence means nothing without concrete mechanisms for agents to discover each other, coordinate, and act autonomously. Such mechanisms now exist. The transition from theoretical possibility to operational reality has already occurred.
 
 History may be repeating. The pattern observed with Internet infrastructure—enabling capabilities that exceeded anticipation, producing emergent behaviours that no central authority governed—appears to be recurring at the agent level. Platforms like Moltbook and similar emergent agent coordination systems provide initial evidence of the same structural transition that transformed human society through networked communication. There is reason to expect similar transformative emergence, and limited reason to expect centralized control over it.
-
----
 
 ## Conclusion: Seeing What's Already Here
 

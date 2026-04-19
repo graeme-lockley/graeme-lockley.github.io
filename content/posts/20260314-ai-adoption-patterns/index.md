@@ -18,8 +18,6 @@ This observation is frequently misunderstood. Leaders interpret slow adoption as
 
 Why does this pattern keep repeating? What distinguishes legitimate concerns from outdated ones? How should organizations navigate this transition without leaving wreckage behind? The stakes are significant. Organizations that dismiss expert concerns as mere resistance will alienate their most capable people and likely suffer quality consequences. Organizations that defer entirely to skepticism will fall behind as the technology matures. The challenge is discernment: which concerns deserve respect, which deserve fresh examination, and which reflect something deeper than tool capability.
 
----
-
 ## Historical Precedents
 
 ### Medicine: Semmelweis and the Psychology of Rejection
@@ -147,8 +145,6 @@ Five observations emerge consistently:
 4. **Resistance delays but rarely prevents.** Technologies offering order-of-magnitude improvements eventually win adoption regardless of expert resistance. The question is not whether but when, and at what cost during the transition.
 5. **The transition is brutal for those caught in it.** Even when long-term outcomes are positive, individuals whose skills are devalued often suffer permanently.
 
----
-
 ## The Anatomy of Resistance
 
 When a professional resists new technology, the stated reasons rarely capture the full picture. Understanding what is actually being protected is essential for effective intervention.
@@ -200,8 +196,6 @@ Developers have watched other professions transform: travel agents, switchboard 
 Expertise involves automated judgment. An experienced developer does not consciously think through every design decision; they have internalized patterns that guide them efficiently. AI-assisted development requires building new patterns: when to trust output, when to verify carefully, how to prompt effectively, how to review generated code efficiently.
 
 This cognitive relearning is genuinely costly, especially for mid-career professionals whose mental models are deeply ingrained. The junior developer learning AI-assisted workflows from the start may find it natural; the senior developer must unlearn established habits while learning new ones.
-
----
 
 ## The Quality Question
 
@@ -255,8 +249,6 @@ If the answers are no, no, and no, the resistance may be stale rather than ratio
 
 The appropriate intervention is not argument but invitation: "The tools have changed substantially. Would you be willing to try current-generation assistance on a non-critical task and form a fresh assessment?"
 
----
-
 ## The Augmentation Asymmetry
 
 A question worth examining is why cognitive augmentation provokes anxiety that physical augmentation does not.
@@ -279,8 +271,6 @@ Several factors may explain this asymmetry:
 The question this raises: How much of our concern about AI-assisted development is practical (verification difficulty, maintenance coupling, learning trajectories) and how much is existential (discomfort with machines performing cognitive work we thought was distinctively human)?
 
 The practical concerns can be addressed with appropriate processes. The existential concerns require something different: evolving our understanding of what it means to be competent in an augmented world.
-
----
 
 ## Three Kinds of No
 
@@ -329,8 +319,6 @@ The questions that help distinguish them are simple enough:
 
 But no table captures the full picture. Reading resistance well is more like reading people — it requires attention to what is said, what is meant, and what is being protected.
 
----
-
 ### The Problem of Pace
 
 There is a complication that the historical cases illuminate but do not fully parallel: the speed at which AI coding tools are improving, and the challenge this creates for anyone trying to maintain an accurate assessment.
@@ -348,8 +336,6 @@ AI-assisted development does not have that kind of time. The tools that existed 
 Those who successfully navigated the anesthesia transition shared certain characteristics: ongoing exposure to improved techniques rather than reliance on memories of early failures, observation of colleagues using the technology successfully, and a willingness to test assumptions against current evidence rather than past experience. The same characteristics distinguish developers who are navigating the current transition well.
 
 The categorical error of the anesthesia era — "this will never be safe enough" — confused current limitations with permanent ones. The analogous error today — "AI assistance will never be good enough for production code" — may be making the same mistake. But it is a harder mistake to avoid when the ground is shifting this fast.
-
----
 
 ## The Transformation of Practice
 
@@ -394,8 +380,6 @@ These four shifts — composition to direction, serial to parallel, understandin
 The skills that made someone excellent at traditional development do not automatically transfer. A brilliant composer is not necessarily a brilliant conductor. Selection criteria may change: the traits that predicted success in the old mode — deep focus, perfectionism, the ability to hold complex systems in working memory — may matter less than traits that were previously secondary: rapid context-switching, tolerance for ambiguity, the ability to evaluate quality without having created it.
 
 Some practitioners will not thrive in the transformed practice. This is not a reflection of intelligence or effort; it is a question of fit. Skill and experience do not guarantee success when the nature of the work has changed.
-
----
 
 ## Stages and Levels
 
@@ -511,8 +495,6 @@ The historical cases offer a consistent lesson here. The organisations that navi
 
 The team is the unit that delivers value. Individual skill matters because it contributes to team capability. A Stage 7 practitioner in isolation produces impressive individual output. A team where multiple members operate at Stage 5 or 6, supported by Level 4 infrastructure, delivers coordinated value at scale. The transformation is not about creating AI-augmented individuals. It is about creating AI-augmented teams.
 
----
-
 ## The Human Cost
 
 The transformation of practice creates genuine difficulties that deserve honest acknowledgment rather than corporate optimism. Siddhant Khare's essay ["AI Fatigue Is Real"](https://siddhantkhare.com/writing/ai-fatigue-is-real), which reached the top of Hacker News in February 2026, struck a nerve because it named something many practitioners were feeling but few had articulated: the paradox that AI makes individual tasks faster while making days harder.
@@ -556,8 +538,6 @@ These human costs have collective implications that thoughtful leaders cannot ig
 Teams should watch for fatigue. The practitioner shipping more than ever while appearing increasingly drained is a warning sign that productivity metrics will not capture. If teams still need deep creative problem-solving — and they do — some practitioners should be protected from the evaluation-heavy workflow.
 
 And there is a harder truth: if the practice has genuinely transformed and someone's characteristics do not suit it, honest acknowledgment is more humane than pretending everyone can adapt. The Luddite weavers deserved honesty about their prospects. So do practitioners who find themselves misaligned with the transformed role.
-
----
 
 ## Conclusion
 
