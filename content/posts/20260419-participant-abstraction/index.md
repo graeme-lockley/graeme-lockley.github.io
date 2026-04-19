@@ -12,9 +12,29 @@ The disappointment is easy to misread as a capability problem. If only the model
 
 The successor to the agent abstraction is not a better agent. It is a different abstraction: the _digital worker_, understood as a persistent organisational participant. Participation cannot be bolted on through clever prompting. It requires a design that accounts explicitly for the structures organisations already run on — bounded delegation of authority, a self that persists through pressure, internalised norms, cultivated relationships, finite attention — and for the lifecycle processes that make participation possible over time. The missing design layer is not more capability. It is a set of constructs that existing agent frameworks mostly do not name, and therefore do not build.
 
+For the purposes of this essay:
+
+> A _digital worker_ is a persistent, role-bearing participant with a bounded mandate, a protected identity, and the capacity to engage through both formal systems and informal organisational channels — subject to socialisation on entry and review over time.
+
+The distinction this draws is easiest to see by setting the dominant abstractions side by side:
+
+| Dimension     | Prompt | Agent              | Participant                        |
+|---------------|--------|--------------------|------------------------------------|
+| Unit          | Task   | Executor           | Role-holder                        |
+| Persistence   | None   | Session / partial  | Durable, across time               |
+| Mandate       | None   | Implicit in prompt | Explicit, enforced at action       |
+| Identity      | None   | Last N tokens      | Constitutional + evolving          |
+| Culture       | None   | None               | Internalised, reviewable           |
+| Relationships | None   | Records            | First-class state                  |
+| Attention     | None   | FIFO               | Prioritised, auditable             |
+| Governance    | None   | Logs, post-hoc     | Policy + audit + override + review |
+| Lifecycle     | None   | Deploy             | Socialise → review → retire        |
+
+Each row names something the rest of this essay argues for. The piece develops the constructs in turn and then grounds them in a single worker — Priya, a digital Customer Operations participant — so that mandate, identity, memory, relationships, and review can be inspected concretely rather than abstractly.
+
 ## What Participation Actually Is
 
-Before proposing a new abstraction it is worth being concrete about what it needs to capture. A person in an organisational role does roughly the following, continuously and mostly without comment.
+The table above compresses a great deal. Before unpacking it row by row, it is worth being concrete about the behaviour a participant abstraction has to capture in the first place. A person in an organisational role does roughly the following, continuously and mostly without comment.
 
 They _carry context_ across days, weeks, and years. Conversations, decisions, and relationships accumulate and are available the next time a similar situation arises. They _absorb culture_: the unwritten rules about how things are done here — how blunt one can be in chat, who gets CC'd on what, when it is acceptable to commit and when one must defer. They were _socialised_ into that culture; they did not arrive with it.
 
@@ -147,6 +167,8 @@ _Attention_ is the inner-ring construct most obviously missing from current desi
 Between the inner ring and the world sit two operational surfaces. They are the unfashionable part of the design, and also the part without which the fashionable parts are theatre.
 
 _Tools_ are the mechanisms by which the worker acts on external systems: sending an email, updating a ticket, posting to a chat channel, modifying an incident record. Each tool invocation is a point of action and therefore a point at which mandate is enforced. If the tool layer does not check mandate, the mandate is decorative. _Access_ is what the worker can _see_: which data, which systems, which channels, which histories. Access is derived from mandate — a worker should not perceive what its role has no business perceiving — and is also the easiest place to get wrong, because broad access is typically granted for convenience during development and never revisited. The rest of the model is only as trustworthy as the tool-level and access-level enforcement points.
+
+A further distinction cuts across both surfaces: organisations run on two kinds of traffic, and a participant must operate on both. _Formal channels_ — tickets, records, signed emails, incident updates, contract language — are auditable, structured, and carry commitments; their outputs are what the organisation is legally and operationally on the hook for. _Informal channels_ — chat threads, direct messages, quick back-channel checks, the "do you have a minute?" conversation — are where tone is calibrated, context is shared, and coordination happens before anything is committed to the record. They are not lesser. They are where most of the work of working together actually happens. A participant that can operate only on formal channels is a ticket-bot; a participant that cannot reliably tell formal from informal is a liability (a comment in chat accidentally treated as a statement of fault is the small version of this problem; the large version is slowly eroding the distinction until the organisation cannot tell which utterances commit it and which do not). Treating informal interaction as a first-class surface — subject to the same mandate enforcement and the same access rules as formal action, but with different expectations about tone, latency, and commitment — is part of what separates a participant from an executor, and it is one of the places current frameworks most visibly stop: they generally assume a task interface, not a colleague one.
 
 ## The Processes: Socialisation and Review
 
