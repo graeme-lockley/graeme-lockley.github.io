@@ -115,7 +115,7 @@ The AI wave intensifies all of this because it combines three scarce resources: 
 
 This matters because frontier capability does not emerge in a flat landscape. It concentrates where capital markets, hyperscale infrastructure, semiconductor access, and elite research communities intersect. Innovation may be internationally sourced, but control over deployment, standards, and downstream economic value is increasingly held by a narrow set of companies and jurisdictions.
 
-This is the emerging industrial pattern of the age: globally distributed talent feeding institutionally concentrated capability. In earlier eras, industrial power centred on ports, rail, oil, and steel. In this one, it centres on model training, inference infrastructure, chip supply, and the platform ecosystems that absorb the gains. Watch any major AI product launch and you will notice: the faces on stage are globally diverse, and more than half were often not born in the country hosting the company. Bright minds from everywhere, drawn toward the places where capital and infrastructure concentrate. The talent is international. The ownership is not. The result is a system whose outputs are globally consequential but whose accountability is vanishingly local — and nowhere is that gap more visible than in how truth itself has come to be managed.
+This is the emerging industrial pattern of the age: globally distributed talent feeding institutionally concentrated capability. In earlier eras, industrial power centred on ports, rail, oil, and steel. In this one, it centres on model training, inference infrastructure, chip supply, and the platform ecosystems that absorb the gains. Watch any major AI product launch and you will notice something striking: the faces on stage are often globally diverse, many shaped by journeys across borders. Bright minds from everywhere, drawn toward the places where capital and infrastructure concentrate. The talent is international. The ownership is not. The result is a system whose outputs are globally consequential but whose accountability is vanishingly local — and nowhere is that gap more visible than in how truth itself has come to be managed.
 
 ## The Fragmentation of Truth and the Normalisation of Dishonesty
 
@@ -148,7 +148,7 @@ But the disappearance of one order does not imply the disappearance of agency. I
 
 Hope has not disappeared — it has decentralised. The macro narrative is one of instability. The micro narrative remains one of creativity.
 
-## Conclusion: A World Less Legible, More Effective
+## Conclusion: A World Less Legible, More Powerful
 
 The present crisis is not simply moral fatigue or political disappointment. It is the lived experience of transition from one organising logic of the world to another. That transition is producing systems that are in some respects more powerful and more capable than what came before, but also more opaque, more concentrated, and less accountable to inherited public expectations.
 
@@ -160,7 +160,7 @@ The world is not ending. But it is becoming harder to recognise.
 
 And perhaps that is the deeper source of unease — not that systems have failed, but that the ones replacing them are still forming, still opaque, and not yet worthy of trust.
 
-If hope exists, it will not come from the restoration of what was. It will come from what we are willing to build next.
+If hope exists, it will not come from the restoration of what was. It will come from what we are willing to build next. It will be built in institutions small enough to be accountable, technologies designed with restraint, and communities willing to recover the habit of truth.
 
 The preamble to the Charter does not begin with *We the states* or *We the governments*. It begins with *We the peoples*. That was a deliberate choice by delegates who understood that institutions, left unchecked, tend toward self-perpetuation rather than service. Whatever legitimate order comes next will not be restored by institutions correcting themselves from within. It will be built, if it is built at all, by peoples who decide that the moral substance of that 1945 compact — not its imperfect architecture, but its underlying demand for dignity, equality, and cooperative restraint — remains worth the effort of reconstruction.
 
