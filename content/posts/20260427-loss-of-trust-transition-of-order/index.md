@@ -26,9 +26,13 @@ toc: false
 
 *Those words were signed in San Francisco in June 1945, by representatives of fifty nations emerging from a war that had killed between sixty and eighty million people. They were not aspirational rhetoric. They were a compact between peoples who had witnessed, at enormous cost, what the absence of such principles meant in practice. The distance between that declaration and the world of 2026 is one of the most important — and most painful — facts of our time.*
 
+*I was raised to believe that those words described a direction of travel — that however imperfect the world might be, it was bending, slowly and unevenly, toward that ideal.*
+
+*It is no longer obvious that this is true.*
+
 There is a growing intuition — difficult to ignore — that something fundamental is unravelling in the world. Trust appears diminished. Hope feels thinner.
 
-Across political systems, international institutions, economic arrangements, and technological platforms, a common sentiment has hardened into something more serious than mood: trust is thinning out. That matters because trust is not decorative. It is a condition of social cooperation, economic exchange, and institutional legitimacy. As [Our World in Data's synthesis of trust research](https://ourworldindata.org/trust) makes plain, societies with lower trust tend to carry higher transaction costs, weaker confidence in institutions, and greater difficulty sustaining collective projects.
+Across political systems, international institutions, economic arrangements, and technological platforms, that intuition has hardened into something more serious than mood. Trust is not decorative. It is a condition of social cooperation, economic exchange, and institutional legitimacy. As [Our World in Data's synthesis of trust research](https://ourworldindata.org/trust) makes plain, societies with lower trust tend to carry higher transaction costs, weaker confidence in institutions, and greater difficulty sustaining collective projects.
 
 The common diagnosis is collapse. But collapse is not quite the right word. A collapse implies that systems have ceased to function. Much of what is unsettling about the present moment is that systems have not ceased to function at all. They continue to govern, allocate, optimise, and enforce. The problem is that their outputs increasingly diverge from the moral and political stories that once justified them.
 
@@ -36,12 +40,7 @@ This is why the present moment feels so unstable. It is not a void. It is a tran
 
 ## The Illusion of Collapse
 
-The first analytical mistake is to assume that disappointing outcomes necessarily mean institutional failure. In many cases, the opposite is true: institutions are operating effectively, but toward ends that are narrower, more selective, and less publicly defensible than the purposes once ascribed to them.
-
-- Governments still legislate, tax, and administer.
-- Markets still concentrate and deploy capital.
-- Multinational firms still scale with extraordinary efficiency.
-- International institutions still coordinate, but often unevenly and under strong power constraints.
+The first analytical mistake is to assume that disappointing outcomes necessarily mean institutional failure. In many cases, the opposite is true: institutions are operating effectively, but toward ends that are narrower, more selective, and less publicly defensible than the purposes once ascribed to them. Governments still legislate, tax, and administer. Markets still concentrate and deploy capital. Multinational firms still scale with extraordinary efficiency. International institutions still coordinate — but often unevenly and under strong power constraints.
 
 The widening distance between institutional promise and institutional output is what produces the contemporary crisis of confidence. Trust weakens not merely when systems stop working, but when they work in ways that no longer feel aligned with the common good. The clearest illustration of that pattern sits at the heart of democratic politics itself.
 
@@ -55,7 +54,7 @@ This helps explain why the crisis is not confined to obviously fragile states. E
 
 South Africa remains a particularly revealing case, not because it is unique, but because its contrasts are so visible. The [World Bank's country overview](https://www.worldbank.org/en/country/southafrica/overview) describes both real post-apartheid social progress and the continuing pressure of poverty, youth population demands, and uneven development. That combination is instructive. Democratic transition can be genuine and still fail to close the gap between institutional aspiration and lived experience.
 
-The system works — but not evenly, and not for all. The same pattern repeats at the global level — only there, the mechanisms of correction are even fewer.
+The system works — but not evenly, and not for all. For many people, this is not experienced as theory but as a quiet recalibration of expectation — the sense that effort no longer reliably translates into progress. The same pattern repeats at the global level — only there, the mechanisms of correction are even fewer.
 
 ## International Law and the Return of Power
 
@@ -63,7 +62,7 @@ The post-war rules-based order was never simply a moral aspiration; it was insti
 
 Yet the same Charter also reveals the architecture of the problem. Article 24 gives the Security Council primary responsibility for international peace and security, while Article 27 preserves the privileged position of the permanent members. The contradiction is structural, not accidental: universal legal principle sits inside an institution whose enforcement mechanism is shaped by concentrated geopolitical power.
 
-This is why contemporary violations of international norms feel so corrosive. They do not merely demonstrate hypocrisy. They reveal the latent truth of the system: international law is strongest when it aligns with the interests of powerful states and weakest when it attempts to restrain them. What appears as breakdown is often a reversion to first principles of power politics. If conventional law cannot reliably bind the powerful, the question becomes: what does? The answer, increasingly, is infrastructure.
+This is why contemporary violations of international norms feel so corrosive. They do not merely demonstrate hypocrisy. They reveal the latent truth of the system: international law is strongest when it aligns with the interests of powerful states and weakest when it attempts to restrain them. For people living in smaller or weaker states, this is not a theoretical observation. It is the daily reality of operating in a world where the rules apply unevenly, and where an appeal to international law can feel like writing letters to an institution that has already been captured. What appears as breakdown is often a reversion to first principles of power politics. If conventional law cannot reliably bind the powerful, the question becomes: what does? The answer, increasingly, is infrastructure.
 
 ## Economic Warfare and Infrastructure Power
 
@@ -79,7 +78,7 @@ This form of power has three features that make it especially difficult to conte
 2. **Asymmetry**. The effects are distributed globally while decision-making remains concentrated inside a small number of states and institutions.
 3. **Legality without legitimacy**. Measures can be lawful within national systems while still appearing arbitrary or devastating from the outside.
 
-The effect is a world that feels less governed by shared rules than by strategic position within infrastructure. And that shift is not confined to states. The technology companies that reshaped daily life in the early twenty-first century followed a strikingly parallel logic.
+The effect is a world that feels less governed by shared rules than by strategic position within infrastructure. The consequences are often felt far from the decisions that produce them, by people who have no visibility into the systems shaping their lives. And that shift is not confined to states. The technology companies that reshaped daily life in the early twenty-first century followed a strikingly parallel logic.
 
 ## The Moral Trajectory of Technology Firms
 
@@ -94,9 +93,13 @@ But firms do not remain suspended in founding idealism. They move through a reco
 
 At that point, the relevant question is no longer what the company once said it valued, but what the system rewards. Advertising-driven attention markets, platform lock-in, aggressive data extraction, and the externalisation of social cost are not moral accidents. They are predictable outcomes of business models optimised for growth and defensibility.
 
+As a technologist, I lived through the period in which these companies were seen as broadly benevolent — when expanding access to information and reducing friction felt intrinsically aligned with public good.
+
+That belief mattered. Its erosion matters more.
+
 That is why the public reassessment of large technology firms has become sharper. It is also why antitrust pressure has intensified. Even without resting the argument on any single case, the fact that monopoly concerns now define major regulatory action against dominant platforms is itself evidence that concentration is no longer a marginal critique.
 
-The disillusionment this produces is not straightforwardly a betrayal. It is something more troubling: the realisation that the structure was never designed to sustain the idealism. The system incentivises optimisation, not benevolence. The anomaly was expecting it to do otherwise. And those same firms that optimised for profit also became the architecture through which public reality is assembled.
+The disillusionment this produces is not straightforwardly a betrayal. It is something more troubling: the realisation that the structure was never designed to sustain the idealism. The system incentivises optimisation, not benevolence. The anomaly was expecting it to do otherwise. We moved, almost without noticing, from tools that extended human capability to systems that compete for human attention. And those same firms that optimised for profit also became the architecture through which public reality is assembled.
 
 ## Monopoly and the Control of Epistemic Infrastructure
 
@@ -104,7 +107,7 @@ Economic concentration matters not only because it reduces competition, but beca
 
 This is one of the clearest ways the trust problem becomes political. The [United Nations' Information Integrity initiative](https://www.un.org/en/information-integrity) argues that the modern information ecosystem is threatened by the unprecedented volume, velocity, and virality of misinformation, disinformation, and hate speech, and that new leaps in AI capability intensify those risks. That framing is useful because it shifts the focus away from individual bad actors toward systemic incentive design.
 
-An environment optimised for engagement is not neutral with respect to truth. It tends to reward content that is emotive, polarising, identity-confirming, or algorithmically sticky. Under those conditions, public discourse becomes harder to stabilise. The issue is not simply that falsehood exists. Falsehood has always existed. The issue is that the infrastructure through which public reality is assembled is now itself organised around commercial optimisation. That concentration of epistemic power is now being turbocharged by artificial intelligence.
+An environment optimised for engagement is not neutral with respect to truth. It tends to reward content that is emotive, polarising, identity-confirming, or algorithmically sticky. Under those conditions, public discourse becomes harder to stabilise. Most of us encounter this not as abstraction but as lived texture: the recommendation that leads somewhere unsettling, the search result optimised away from accuracy, the feed that seems to know us better than we know ourselves — and uses that knowledge to keep us engaged, not informed. The issue is not simply that falsehood exists. Falsehood has always existed. The issue is that the infrastructure through which public reality is assembled is now itself organised around commercial optimisation. That concentration of epistemic power is now being turbocharged by artificial intelligence.
 
 ## Talent Migration and the Industrial Technological Complex
 
@@ -112,7 +115,7 @@ The AI wave intensifies all of this because it combines three scarce resources: 
 
 This matters because frontier capability does not emerge in a flat landscape. It concentrates where capital markets, hyperscale infrastructure, semiconductor access, and elite research communities intersect. Innovation may be internationally sourced, but control over deployment, standards, and downstream economic value is increasingly held by a narrow set of companies and jurisdictions.
 
-This is the emerging industrial pattern of the age: globally distributed talent feeding institutionally concentrated capability. In earlier eras, industrial power centred on ports, rail, oil, and steel. In this one, it centres on model training, inference infrastructure, chip supply, and the platform ecosystems that absorb the gains. The result is a system whose outputs are globally consequential but whose accountability is vanishingly local — and nowhere is that gap more visible than in how truth itself has come to be managed.
+This is the emerging industrial pattern of the age: globally distributed talent feeding institutionally concentrated capability. In earlier eras, industrial power centred on ports, rail, oil, and steel. In this one, it centres on model training, inference infrastructure, chip supply, and the platform ecosystems that absorb the gains. Watch any major AI product launch and you will notice: the faces on stage are globally diverse, and more than half were often not born in the country hosting the company. Bright minds from everywhere, drawn toward the places where capital and infrastructure concentrate. The talent is international. The ownership is not. The result is a system whose outputs are globally consequential but whose accountability is vanishingly local — and nowhere is that gap more visible than in how truth itself has come to be managed.
 
 ## The Fragmentation of Truth and the Normalisation of Dishonesty
 
@@ -122,7 +125,7 @@ This is where the trust literature and the information-integrity literature begi
 
 The consequence is not that lying has become virtuous. It is that the audience capable of enforcing reputational consequences has fractured. In a segmented information order, contradiction can persist indefinitely because there is no longer one public but many publics, each with its own validators, incentives, and narrative boundary markers.
 
-There is a further dimension that deserves naming directly. There is no ethical tradition — no religion, no secular philosophy, no moral code worth the name — that holds dishonesty to be acceptable. And yet the present moment is characterised by public figures who lie with demonstrable confidence, secure in the knowledge that their audiences are sealed from correction. This is not a new feature of political life. What is new is the structural impunity. Fragmented information ecosystems mean that falsehoods circulate within closed loops, insulated from unified reputational consequence. The cost of dishonesty has not merely fallen — for those with sufficient platform or power, it has effectively been eliminated.
+There is a further dimension that deserves naming directly. There is no ethical tradition — no religion, no secular philosophy, no moral code worth the name — that holds dishonesty to be acceptable. And yet the present moment is characterised by public figures who lie with demonstrable confidence, secure in the knowledge that their audiences are sealed from correction. This is not a new feature of political life. What is new is the structural impunity. Fragmented information ecosystems mean that falsehoods circulate within closed loops, insulated from unified reputational consequence. The cost of dishonesty has not merely fallen — for those with sufficient platform or power, it has effectively been eliminated. It is increasingly unclear not just who to trust, but whether we are even participating in the same reality.
 
 ## Transition, Not Collapse
 
@@ -135,7 +138,7 @@ The world is moving:
 - from shared public reality toward fragmented epistemic worlds,
 - from institutional idealism toward constrained optimisation.
 
-This does not make the present order illegible because nothing works. It makes it illegible because too much works, but in ways that are harder to narrate, harder to contest, and harder to align with democratic expectations.
+This does not make the present order illegible because nothing works. It makes it illegible because too much works, but in ways that are harder to narrate, harder to contest, and harder to align with democratic expectations. That is an uncomfortable place to sit. But discomfort is not the same as despair.
 
 ## The Question of Hope
 
@@ -152,6 +155,12 @@ The present crisis is not simply moral fatigue or political disappointment. It i
 That is why the age feels so disorienting. The institutions are still here. The language of law, democracy, and progress is still here. But the mechanisms through which power actually operates have shifted beneath them. The emerging order is, in many ways, more efficient and more effective than what preceded it. But it is less legible — harder to understand, harder to contest, and harder to believe in.
 
 The task now is not to pretend that the old equilibrium can be restored intact. It is to build forms of trust, legitimacy, and accountability that are adequate to the order that is emerging.
+
+The world is not ending. But it is becoming harder to recognise.
+
+And perhaps that is the deeper source of unease — not that systems have failed, but that the ones replacing them are still forming, still opaque, and not yet worthy of trust.
+
+If hope exists, it will not come from the restoration of what was. It will come from what we are willing to build next.
 
 The preamble to the Charter does not begin with *We the states* or *We the governments*. It begins with *We the peoples*. That was a deliberate choice by delegates who understood that institutions, left unchecked, tend toward self-perpetuation rather than service. Whatever legitimate order comes next will not be restored by institutions correcting themselves from within. It will be built, if it is built at all, by peoples who decide that the moral substance of that 1945 compact — not its imperfect architecture, but its underlying demand for dignity, equality, and cooperative restraint — remains worth the effort of reconstruction.
 
