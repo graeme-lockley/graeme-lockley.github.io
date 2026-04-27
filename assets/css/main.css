@@ -40,6 +40,34 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body.page-watermark::before {
+  position: fixed;
+  left: 2vw;
+  bottom: 10vh;
+  z-index: 0;
+  pointer-events: none;
+  font-family: var(--font-sans);
+  font-size: clamp(5rem, 18vw, 14rem);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: rotate(-45deg);
+}
+
+body.page-watermark .site-header,
+body.page-watermark .container,
+body.page-watermark .site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+body.page-watermark-draft::before {
+  content: "DRAFT";
+  color: rgba(160, 0, 0, 0.08);
+}
+
 .container {
   max-width: var(--content-width);
   margin: 0 auto;
@@ -447,5 +475,12 @@ figcaption {
   blockquote {
     padding: var(--space-sm) var(--space-md);
     font-size: 1.1rem;
+  }
+
+  body.page-watermark::before {
+    left: -10vw;
+    bottom: 18vh;
+    font-size: clamp(4rem, 28vw, 8rem);
+    letter-spacing: 0.12em;
   }
 }

@@ -8,7 +8,7 @@
   {{ $style := resources.Get "css/main.css" | minify }}
   <link rel="stylesheet" href="{{ $style.RelPermalink }}">
 </head>
-<body>
+<body{{ with .Params.watermark }} class="page-watermark page-watermark-{{ . }}"{{ end }}>
   {{ partial "header.html" . }}
   
   <main class="container">
