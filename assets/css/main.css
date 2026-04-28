@@ -261,7 +261,7 @@ blockquote {
   padding: var(--space-md) var(--space-lg);
   border-left: 3px solid var(--accent);
   background: var(--bg-secondary);
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   font-style: italic;
   line-height: 1.55;
   color: var(--text-primary);
@@ -269,6 +269,8 @@ blockquote {
 
 blockquote p {
   text-align: left;
+  padding-left: 1.5em;
+  text-indent: -1.5em;
 }
 
 blockquote p:last-child {
