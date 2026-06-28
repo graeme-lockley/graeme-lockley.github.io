@@ -1,6 +1,6 @@
 ---
 title: "The Loop and the Harness"
-date: 2026-06-29
+date: 2026-06-28
 description: "Why the most important question in AI-assisted work is no longer what to ask, but what system to build --- and why the answer applies far beyond software."
 tags: ["ai", "software-development", "agents", "loop-engineering", "harness", "knowledge-work"]
 draft: false
