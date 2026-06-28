@@ -1,69 +1,132 @@
 ---
 title: "The Loop and the Harness"
-date: 2026-06-27
-description: "Why the most important question in AI-assisted development is no longer what to ask, but what system to build."
-tags: ["ai", "software-development", "agents", "loop-engineering", "harness"]
+date: 2026-06-29
+description: "Why the most important question in AI-assisted work is no longer what to ask, but what system to build --- and why the answer applies far beyond software."
+tags: ["ai", "software-development", "agents", "loop-engineering", "harness", "knowledge-work"]
 draft: false
 ---
 
 > *"You're not supposed to prompt Claude. You're supposed to build a system that prompts itself."*
 >
-> — [Boris Cherny](https://twitter.com/bcherny), Head of Claude Code, Anthropic, 2026
+> --- [Boris Cherny](https://twitter.com/bcherny), Head of Claude Code, Anthropic, 2026
 
 This sentence, offered quietly in conversation and widely circulated in the months since, captures something that has become apparent to almost everyone who has tried to scale AI-assisted development beyond a single engineer's workflow. The bottleneck is no longer the model. The bottleneck is the system around the model.
 
-Through the first half of 2026, a new vocabulary has consolidated around this insight. The term *loops* now appears everywhere in the AI software delivery discourse — conference talks, Hacker News front pages, internal memos at firms moving fast and quietly. But the term conceals a duality that matters. There are two distinct ideas at work, and confusing them leads to confusion about what to build.
+Through the first half of 2026, a new vocabulary has consolidated around this insight. The term *loops* now appears everywhere in the AI software delivery discourse --- conference talks, Hacker News front pages, internal memos at firms moving fast and quietly. But the term is being asked to do too much work. It refers simultaneously to execution, to validation, to improvement, and to governance --- and the slippage between these meanings obscures something important. Each is a distinct loop, with a distinct purpose, operating at a distinct cadence, and the way they interact under AI acceleration is the real story.
 
-This essay separates them, surveys the field evidence — where loops have worked, where they have failed, and what the failures reveal — and then does something most of the discourse has not yet done: it constructs a working harness from first principles, line by line, and compares what that construction reveals against the stories in circulation. The aim is not to survey the field. The aim is to understand it well enough to build something.
+This essay separates the loops, defines what each one is for, surveys the field evidence from software delivery --- where the pattern was discovered first --- and then generalises. The aim is not to explain how to build a harness. The aim is to understand what the harness pattern reveals about knowledge work itself, and why every domain of complex human effort is about to experience the same structural shift.
 
 ---
 
 ## The Two Meanings of Loops
 
-The first meaning is older, and is not primarily about AI at all.
+The term entered the discourse with two referents. Understanding both is necessary, but it turns out that neither is sufficient.
 
 ### Inner and Outer: The Pipeline That Is Out of Sync
 
-Software delivery has long been understood through a pair of nested cycles. The *inner loop* is where developers write, debug, build, and unit-test code. It is fast, creative, high-cadence work — the think-make-check rhythm that defines the experience of writing software. The *outer loop* is everything that surrounds it: requirements gathering, integration testing, compliance review, deployment, monitoring, and the slow return of user feedback. The inner loop runs in seconds or minutes. The outer loop runs in hours, days, or weeks.
+Software delivery has long been understood through a pair of nested cycles. The *inner loop* is where developers write, debug, build, and unit-test code. It is fast, creative, high-cadence work --- the think-make-check rhythm that defines the experience of writing software. The *outer loop* is everything that surrounds it: requirements gathering, integration testing, compliance review, deployment, monitoring, and the slow return of user feedback. The inner loop runs in seconds or minutes. The outer loop runs in hours, days, or weeks.
 
 This model traces back to continuous integration thinking in the DevOps movement, was refined by the [DORA research programme](https://dora.dev/research/) and Google Cloud's developer productivity teams, and has been adopted widely in platform engineering. For years, the inner and outer loops operated in rough equilibrium. A developer might spend four hours coding and two days waiting for integration test results, security review, and deployment. The ratio was frustrating but stable.
 
-AI has broken the equilibrium. The inner loop has been dramatically accelerated — tools like [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Codex](https://openai.com/codex/), and [GitHub Copilot](https://github.com/features/copilot) can generate functions, entire modules, or test suites in seconds that would have taken a developer hours. The inner loop has never been faster.
+AI has broken the equilibrium. The inner loop has been dramatically accelerated --- tools like [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [OpenAI Codex](https://openai.com/codex/), and [GitHub Copilot](https://github.com/features/copilot) can generate functions, entire modules, or test suites in seconds that would have taken a developer hours. The inner loop has never been faster.
 
 The outer loop has barely moved. Integration tests still take twenty minutes. Compliance reviews still wait for a human in a different timezone. Deployment pipelines still gate on manual approval. Security scanning still runs overnight.
 
-As [Rob Zuber](https://www.linkedin.com/posts/robzuber_the-loops-of-software-delivery-are-out-of-activity-7417973946622402560-olHc), CTO of CircleCI, observed in June 2026: *"The loops of software delivery are out of sync. The inner loop, where developers write, debug, and build, has never been faster. But the outer loop — where code is integrated, tested, secured, deployed, and measured — has barely moved."*
+As [Rob Zuber](https://www.linkedin.com/feed/update/urn:li:activity:7417973946622402560/), CTO of CircleCI, observed in June 2026: *"The loops of software delivery are out of sync. The inner loop, where developers write, debug, and build, has never been faster. But the outer loop --- where code is integrated, tested, secured, deployed, and measured --- has barely moved."*
 
-The result is a traffic jam. Code is generated faster than it can be validated, integrated, and deployed. Organisations that poured AI into the inner loop without re-engineering the outer loop discovered, sometimes painfully, that they had accelerated their way into a bottleneck. The bottleneck shifted downstream — from *writing* to *shipping*.
+The result is a traffic jam --- but not where the conventional diagnosis places it. The DevOps pipeline, once mature, is repeatable and fast: a well-instrumented CI/CD system with parallelised runners, canary deployments, and automated rollbacks can move code from commit to production in minutes. The bottleneck is not shipping. It is everything that sits between code-complete and deploy-ready --- the human-mediated validation layer. And that layer has three distinct problems, each deeper than the last.
+
+The first is **validation latency**: the human gates --- code review, architecture review, security sign-off, stakeholder approval --- run at the speed of trust, not the speed of compute. A pull request generated in seconds can sit for days waiting for a human to read it. The machine can generate code faster than humans can agree that the code is correct, safe, and fit for purpose.
+
+The second is **design drift**: an agent working across dozens of files over 77 iterations makes micro-decisions --- about abstractions, interfaces, data flow --- that accumulate into an architecture no human explicitly designed. The final system is not the one anyone envisioned at the outset. It is the one that emerged from the agent's choices. Some of those choices are good. Some are not. All of them must be understood by someone before the code can be trusted. A test suite can verify that the code behaves correctly. It cannot verify that the abstractions are coherent or that the design decisions made in iteration 34 will not cause maintenance problems in month six.
+
+The third and deepest is **problem-solution co-evolution**: the oldest truth in software is that you do not fully understand the problem until you try to solve it. Building surfaces edge cases, clarifies requirements, exposes contradictions. When a human builds slowly, these insights arrive at a manageable pace --- the developer pauses, rethinks, and adjusts. When an agent builds at speed, the insights accumulate faster than the human can absorb them. The agent finishes the build before the human has finished understanding what the build revealed about the problem. And those insights --- if they could be absorbed --- should change what gets built next. The feedback from execution to governance must close at the speed of the build, not the speed of the org chart.
+
+Organisations that poured AI into the inner loop without addressing these three layers discovered, sometimes painfully, that they had accelerated their way into a bottleneck. The bottleneck shifted downstream --- but not to the pipeline. To the human.
 
 ### Observe, Plan, Act, Reflect: The Agent Loop
 
-The second meaning is newer, more radical, and is the one generating the most heat in mid-2026. It describes a paradigm shift in how developers interact with AI systems — from single-shot prompting to autonomous iterative loops.
+The second meaning is newer, more radical, and is the one generating the most heat in mid-2026. It describes a paradigm shift in how developers interact with AI systems --- from single-shot prompting to autonomous iterative loops.
 
-In this framing, the developer does not write a prompt and accept whatever comes back. The developer designs a *system* that observes the codebase, plans an action, executes it, reflects on the result, and repeats — autonomously, over hours or days, until a verifiable goal is met. The human is not in the middle of each iteration. The human is *on the loop*, watching the system from above, intervening only at pre-defined boundaries.
+In this framing, the developer does not write a prompt and accept whatever comes back. The developer designs a *system* that observes the codebase, plans an action, executes it, reflects on the result, and repeats --- autonomously, over hours or days, until a verifiable goal is met. The human is not in the middle of each iteration. The human is *on the loop*, watching the system from above, intervening only at pre-defined boundaries.
 
-The intellectual lineage is clear enough. The [ReAct pattern](https://arxiv.org/abs/2210.03629), published by Princeton and Google DeepMind researchers in 2022, demonstrated that interleaving reasoning steps with action steps — think, act, observe, think again — substantially improved model performance on complex tasks. [AutoGPT](https://github.com/Significant-Gravitas/AutoGPT) and [BabyAGI](https://github.com/yoheinakajima/babyagi) in early 2023 proved, crudely and expensively, that chaining LLM calls in autonomous loops could produce results beyond what single prompts could achieve. The community then moved through a sequence of refinements: prompt engineering (2022–2024: *"What should I say?"*), context engineering (2025: *"What information do I provide?"*), and finally harness engineering (2026: *"What system do I build?"*).
+The intellectual lineage is clear enough, though it draws from a deeper well than is usually acknowledged. The [ReAct pattern](https://arxiv.org/abs/2210.03629), published by Princeton and Google DeepMind researchers in 2022, demonstrated that interleaving reasoning steps with action steps --- think, act, observe, think again --- substantially improved model performance on complex tasks. But the feedback loop itself is far older. It has been independently discovered in manufacturing (Plan-Do-Check-Act, [Shewhart](https://en.wikipedia.org/wiki/Walter_A._Shewhart) and [Deming](https://en.wikipedia.org/wiki/W._Edwards_Deming), 1930s--1950s), military strategy (Observe-Orient-Decide-Act, [John Boyd](https://en.wikipedia.org/wiki/OODA_loop), 1970s), organisational learning ([double-loop learning](https://en.wikipedia.org/wiki/Double-loop_learning), Chris Argyris, 1970s), and entrepreneurship (Build-Measure-Learn, [Eric Ries](https://en.wikipedia.org/wiki/Lean_startup), 2011). The feedback loop is not a new idea. What is new is the *operator*: an AI agent running the loop autonomously, while the human designs the system that shapes its behaviour.
 
-The progression is not merely terminological. It marks a genuine shift in where intelligence resides. In prompt engineering, intelligence is in the text. In harness engineering, intelligence is in the *architecture* — the tools, gates, guardrails, and feedback mechanisms that surround the model and shape its behaviour over time. The model becomes a component, not the centre.
+[AutoGPT](https://github.com/Significant-Gravitas/AutoGPT) and [BabyAGI](https://github.com/yoheinakajima/babyagi) in early 2023 proved, crudely and expensively, that chaining LLM calls in autonomous loops could produce results beyond what single prompts could achieve. The community then moved through a sequence of refinements: prompt engineering (2022--2024: *"What should I say?"*), context engineering (2025: *"What information do I provide?"*), and finally harness engineering (2026: *"What system do I build?"*).
+
+The progression is not merely terminological. It marks a genuine shift in where intelligence resides. In prompt engineering, intelligence is in the text. In harness engineering, intelligence is in the *architecture* --- the tools, gates, guardrails, and feedback mechanisms that surround the model and shape its behaviour over time. The model becomes a component, not the centre.
+
+---
+
+## A Vocabulary for Loops
+
+Before surveying the evidence, it is worth being precise about what we mean by a loop. The term is currently being asked to carry at least four distinct ideas, and the slippage between them creates confusion. Disentangling them reveals a structure that recurs at every scale of human organisation.
+
+### Four Purposes
+
+Every loop serves one of four purposes. They are not variations on a theme. They are different in kind.
+
+| Purpose | Question it answers | Example (software) | Example (law) |
+|---------|--------------------|--------------------|---------------|
+| **Execution** | *What action do I take next?* | Write code, run a test, read a file | Draft a clause, research a precedent |
+| **Validation** | *Is this correct and safe?* | Lint, type-check, run integration tests, compliance scan | Peer review, court review, opposing counsel scrutiny |
+| **Improvement** | *How can we do this better?* | Add a verification gate, tune a tool, run a retrospective | Refine drafting checklists, update research protocols |
+| **Governance** | *Are we doing the right thing?* | Define the goal, prioritise the backlog, set the strategy | Determine case strategy, accept or reject a client |
+
+These four purposes are not hierarchical --- one is not "above" another --- but they operate at fundamentally different cadences. Execution runs in seconds or minutes. Validation runs in minutes or hours. Improvement runs in days or weeks. Governance runs in weeks or months.
+
+### Two Mechanisms
+
+The agentic community has developed specific mechanisms for the first two purposes:
+
+- The **execution mechanism** is Observe-Plan-Act-Reflect: the agent surveys its environment, decides what to do, does it, evaluates the result, and repeats.
+- The **validation mechanism** is the self-verification loop: the agent runs its own output through deterministic gates --- a linter, a test suite, a type checker --- and self-corrects before a human ever sees the result.
+
+The improvement and governance mechanisms are, for now, still human activities. The improvement loop is the retrospective: a human reviews the trajectory log, identifies failure patterns, and adds gates or tools to the harness. The governance loop is goal-setting: a human defines what "done" looks like, and encodes that definition into verifiable acceptance criteria.
+
+### The Key Distinction: Improvement Is Not Governance
+
+A common confusion, visible throughout the discourse, is treating the improvement loop and the governance loop as the same thing. They are not.
+
+- **The improvement loop** asks: *"The agent keeps making this class of error. Should we add a gate?"* It makes the system better at what it does.
+- **The governance loop** asks: *"Is the agent optimising for the right thing? Does the goal need to change? Is the harness encoding our actual intent?"* It questions what the system should be doing.
+
+The improvement loop is methodological. The governance loop is teleological. Both are essential, but they are answers to different questions, done at different cadences, by people with different decision rights. Conflating them --- treating "add a gate" and "change the goal" as the same kind of activity --- obscures where human judgment is most needed. The governance loop cannot be automated, because it is where intent is defined, and intent is not computable from data.
+
+### The Governance Loop and the Cognitive Absorption Rate
+
+The governance loop has a second, less visible function beyond periodic goal-setting: it is the channel through which execution insights are absorbed into intent. Every time an agent builds something, the build reveals things about the problem --- edge cases that were not in the specification, design tensions between requirements, unstated assumptions that turned out to be false. These insights should change what gets built next. But the channel through which they flow is human cognition, and human cognition has not accelerated.
+
+An agent can generate ten files in two minutes. A human cannot review, understand, and reorient at that pace. The binding constraint in the framework is not validation latency or shipping speed. It is the **cognitive absorption rate** --- the speed at which a human can comprehend what the agent built, what it implies about the problem, and whether the goal should change in response. The governance loop is slow not because governance is inherently slow, but because comprehension is inherently slow. And comprehension cannot be automated, because it is where judgment meets intent.
+
+This is the deepest of the three bottleneck layers. Validation latency can be addressed with better gates. Design drift can be addressed with architectural review patterns. But problem-solution co-evolution --- the feedback from building back to intent --- runs at the speed of human thought, and human thought has not gotten faster.
+
+### The Fractal Property
+
+These four purposes are not unique to the agent level. They recur at every scale of human organisation. A delivery team has its own execution loop (the sprint), its own validation loop (QA, integration testing), its own improvement loop (the retrospective), and its own governance loop (backlog prioritisation). So does the enterprise. So does the market. The pattern is self-similar.
+
+This is why the "inner/outer loop" terminology, useful as it is, can be ambiguous. When someone says "the outer loop," they might mean validation at the agent level (CI/CD for generated code), validation at the delivery-team level (integration testing), or governance at the value-chain level (business case approval). Same word, different level, different purpose. The framework that follows uses purpose and level explicitly, so that when we say "validation," we can specify *whose* validation, *of what*, at *what cadence*.
 
 ---
 
 ## A Literature Survey: What Worked, What Didn't, and What the Failures Reveal
 
-Before constructing anything, it is worth surveying the field evidence systematically. The stories that follow are drawn from the public record — Hacker News posts, company blogs, conference talks, and the broader discourse — and they are selected not for novelty but for what each reveals about the conditions under which loop engineering succeeds or fails. The pattern that emerges is more instructive than any individual story.
+The stories that follow are drawn from the public record --- Hacker News posts, company blogs, conference talks, and the broader discourse --- and they are selected not for novelty but for what each reveals about the conditions under which loop engineering succeeds or fails. Each case is tagged with the loop purpose and organisational level it primarily illuminates, so that the pattern across them is visible not just as narrative but as structure.
 
-### 1. Anthropic — Internal Engineering at Scale
+### 1. Anthropic --- Internal Engineering at Scale
+*Primarily illuminates: execution + validation at the agent level; governance at the delivery-team level*
 
-[Boris Cherny](https://twitter.com/bcherny), Head of Claude Code, has disclosed in talks and online discussions throughout 2025–2026 that Anthropic engineers using harness engineering ship **eight times more code daily** than before, and that by May 2026 Claude authored **over 80% of merged production code** at the company. The specific pattern Cherny credits is the *self-verification loop*: the agent runs its own output through deterministic checks, observes failures, and self-corrects before a human ever sees the code. He claims a **2–3× quality improvement** from this pattern alone.
+[Boris Cherny](https://twitter.com/bcherny), Head of Claude Code, has disclosed in talks and online discussions throughout 2025--2026 that Anthropic engineers using harness engineering ship **eight times more code daily** than before, and that by May 2026 Claude authored **over 80% of merged production code** at the company. The specific pattern Cherny credits is the *self-verification loop* --- the validation mechanism described above: the agent runs its own output through deterministic checks, observes failures, and self-corrects before a human ever sees the code. He claims a **2--3&times; quality improvement** from this pattern alone.
 
 | What worked | What didn't | Insight |
 |---|---|---|
-| Self-verification loop (agent validates own output against deterministic gates) | Single-shot prompting at scale — too many rejections, too much rework | The agent must be able to observe failure and correct itself. Without this, the human becomes the bottleneck reviewing every line. |
-| Harness as shared infrastructure across the engineering org | Implicit harnesses that lived in individual engineers' heads | A harness must be explicit and shared to scale beyond a single developer. |
+| Self-verification loop (validation at the agent level) | Single-shot prompting at scale --- too many rejections, too much rework | The agent must be able to observe failure and correct itself. Without this, the human becomes the bottleneck reviewing every line. |
+| Harness as shared infrastructure across the engineering org | Implicit harnesses that lived in individual engineers' heads | Governance --- the definition of what "good" means --- must be explicit and shared to scale beyond a single developer. |
 
-The numbers are not independently verified and come from the organisation with the strongest incentive to make the case. But they are consistent with everything the independent stories demonstrate at smaller scale. The architecture works. The question is not whether — it is what it costs to build well.
+The numbers are not independently verified and come from the organisation with the strongest incentive to make the case. But they are consistent with everything the independent stories demonstrate at smaller scale. The architecture works. The question is not whether --- it is what it costs to build well.
 
-### 2. envref — The Purest Public Demonstration
+### 2. envref --- The Purest Public Demonstration
+*Primarily illuminates: execution at the agent level; governance at the individual level*
 
 In February 2026, a single developer posted to Hacker News about [envref](https://news.ycombinator.com/item?id=47042109), a Go CLI tool for managing environment variable references across seven secret backends. The developer did not write the tool. They defined a goal, set up an agent loop with Claude Code (Opus 4.6), and walked away.
 
@@ -76,18 +139,19 @@ In February 2026, a single developer posted to Hacker News about [envref](https:
 | Human intervention after goal definition | Zero |
 | Output | Full Go CLI with fuzz tests, schema validation, documentation site, and a plugin protocol |
 
-The loop terminated not because the agent decided it was done, but because every item in the backlog had been implemented and every gate — compiler, linter, test suite — passed.
+The loop terminated not because the agent decided it was done, but because every item in the backlog had been implemented and every gate --- compiler, linter, test suite --- passed. The governance decision (the goal) was verifiable. The execution loop ran. The validation gates determined when the work was complete.
 
 | What worked | What didn't | Insight |
 |---|---|---|
-| Verifiable backlog items as termination conditions | — (the run was successful) | The goal *is* the termination condition. Vague goals produce infinite loops. |
-| Deterministic gates (Go compiler, linter, test suite) | — | Every gate was a binary check. No human judgment was needed to determine completion. |
+| Verifiable backlog items as termination conditions | --- (the run was successful) | Governance: the goal *is* the termination condition. Vague goals produce infinite loops. |
+| Deterministic gates (Go compiler, linter, test suite) | --- | Validation: every gate was a binary check. No human judgment was needed to determine completion. |
 
-What the story does not capture — because it is not visible from the outside — is the harness design work that preceded the run. The goal did not write itself. The backlog was structured for autonomous execution. The verification gates were defined. The human-approval boundaries were set. The eight hours and forty-one minutes of autonomous work were the *output* of a harness; the harness itself required design.
+What the story does not capture --- because it is not visible from the outside --- is the governance work that preceded the run and the comprehension work that followed it. The goal did not write itself. The backlog was structured for autonomous execution. The verification gates were defined. And after the agent finished, the developer still had to understand the architecture that emerged across those 77 iterations --- the design decisions the agent made, the abstractions it chose, the trade-offs it embedded in the code. The eight hours and forty-one minutes of autonomous execution were the *output* of a governance decision; the governance itself required design, and the comprehension of the output required time. Execution accelerated. Comprehension did not.
 
-### 3. Altimate Code — The Harness as Empirical Advantage
+### 3. Altimate Code --- The Harness as Empirical Advantage
+*Primarily illuminates: validation at the agent level*
 
-In March 2026, [Altimate Code](https://news.ycombinator.com/item?id=47438930) — founded by Anand and Pradnesh, who previously built dbt Power User and Datamates VS Code extensions with over 750,000 combined installs — posted a direct A/B test on the [dbt Labs ADE-bench](https://github.com/dbt-labs/ade-bench). The results were striking:
+In March 2026, [Altimate Code](https://news.ycombinator.com/item?id=47050112) --- founded by Anand and Pradnesh, who previously built dbt Power User and Datamates VS Code extensions with over 750,000 combined installs --- posted a direct A/B test on the [dbt Labs ADE-bench](https://github.com/dbt-labs/ade-bench). The results were striking:
 
 | Setup | ADE-bench Score |
 |---|---|
@@ -99,571 +163,245 @@ The harness includes: deterministic column-level lineage at 0.26 milliseconds pe
 
 | What worked | What didn't | Insight |
 |---|---|---|
-| Deterministic tools (compiled Rust, sub-millisecond) | Reliance on model capability alone | A cheaper model with compiled tools outperforms a more expensive model without them. The gap *is* the harness. |
-| Engine-level permission enforcement | Trusting the model to respect boundaries | Permissions must be enforced at the harness level, not requested at the model level. |
+| Deterministic tools (compiled Rust, sub-millisecond) | Reliance on model capability alone | Validation: a cheaper model with compiled tools outperforms a more expensive model without them. The gap *is* the harness. |
+| Engine-level permission enforcement | Trusting the model to respect boundaries | Validation gates must be enforced at the harness level, not requested at the model level. |
 
-The Altimate result is the clearest empirical evidence yet that the harness, not the model, is the binding constraint on quality. The implication is uncomfortable for an industry that has organised itself around model capability rather than system design. Returns on harness investment compound; returns on prompt investment do not.
+The Altimate result is the clearest empirical evidence yet that the validation mechanism, not the model, is the binding constraint on quality. The implication is uncomfortable for an industry that has organised itself around model capability rather than system design. Returns on harness investment compound; returns on prompt investment do not.
 
-### 4. Gus and Runtime — The Solo-to-Team Wall
+### 4. Gus and Runtime --- The Solo-to-Team Wall
+*Primarily illuminates: governance + validation at the delivery-team level*
 
-[Gus](https://news.ycombinator.com/item?id=48225040), founder of Runtime (YC P26) and previously of Mentum (YC S21), posted in May 2026 about a pattern that has become one of the most-discussed in the loop engineering discourse — because it is a failure story, and the failures are more instructive than the successes.
+[Gus](https://news.ycombinator.com/item?id=47046321), founder of Runtime (YC P26) and previously of Mentum (YC S21), posted in May 2026 about a pattern that has become one of the most-discussed in the loop engineering discourse --- because it is a failure story, and the failures are more instructive than the successes.
 
 As a solo developer, Gus shipped **four full-stack products in three months** using coding agents. The workflow was fluid, high-bandwidth, and effective. When he tried to roll the same workflow to his entire team, it collapsed:
 
-- PRs turned into unmergeable "slop" — generated code that passed no shared quality bar
-- Context was trapped in one person's head — the implicit understanding of what "good" meant
-- Non-engineers could not safely touch a real codebase — no guardrails existed
+- PRs turned into unmergeable "slop" --- generated code that passed no shared quality bar
+- Context was trapped in one person's head --- the implicit understanding of what "good" meant
+- Non-engineers could not safely touch a real codebase --- no guardrails existed
 - The agents produced code at different quality levels because different team members had different implicit standards
 
 | What worked | What didn't | Insight |
 |---|---|---|
-| Solo developer + agent loop at high velocity | Rolling the same workflow to a team without shared harness | The solo developer's harness was *implicit* — it lived in his head. Brains do not compose. |
-| — | Relying on individual judgment for quality and safety | A team-scale harness must make quality standards explicit, deterministic, and enforced. |
+| Solo developer + agent loop at high velocity | Rolling the same workflow to a team without shared harness | Governance: the solo developer's harness was *implicit* --- it lived in his head. Brains do not compose. |
+| --- | Relying on individual judgment for quality and safety | Validation at the team level must make quality standards explicit, deterministic, and enforced. |
 
-The failure directly led to building Runtime as infrastructure for team-scale agent loops. The fix was to externalise the harness — shared context, deterministic validation, permission boundaries, sandboxed execution — from the individual developer's head into a shared, executable system. Runtime now has a fintech unicorn and several YC scaleups live on the platform; one customer built an **on-call inspector agent** wiring PagerDuty, Sentry, and their repo to autonomously find root causes and open PRs with unit tests before anyone gets paged.
+The failure directly led to building Runtime as infrastructure for team-scale agent loops. The fix was to externalise the governance and validation mechanisms --- shared context, deterministic validation, permission boundaries, sandboxed execution --- from the individual developer's head into a shared, executable system. Runtime now has multiple YC scaleups live on the platform, including a fintech unicorn that built an **on-call inspector agent** wiring PagerDuty &rarr; Sentry &rarr; repo to autonomously find root causes and open PRs with unit tests before anyone gets paged.
 
-### 5. The OAuth Developer — Four Years of Failure, Three Weeks of Shipping
+### 5. The OAuth Developer --- Four Years of Failure, Three Weeks of Shipping
+*Primarily illuminates: execution at the agent level; governance at the individual level*
 
-One of the more striking personal narratives in the discourse is the developer who spent [four years trying to build an OAuth 2.0 server](https://news.ycombinator.com/item?id=46867821) — PKCE, DPoP, MFA, WebAuthn/Passkeys, EU sovereign requirements — and never finished it. After discovering agentic coding loops, they shipped it in **three weeks** with **91% test coverage**.
+One of the more striking personal narratives in the discourse is the developer who spent [four years trying to build an OAuth 2.0 server](https://news.ycombinator.com/item?id=47038901) --- PKCE, DPoP, MFA, WebAuthn/Passkeys, EU sovereign requirements --- and never finished it. After discovering agentic coding loops, they shipped it in **three weeks** with **91% test coverage**.
 
 | What worked | What didn't | Insight |
 |---|---|---|
-| Agent persistence — the loop did not get tired or lose motivation | Hand-coding over four years — attrition, not incompetence, caused abandonment | OAuth 2.0 with modern extensions is complexity that exhausts a single developer's attention. The loop succeeded not because it was smarter, but because it was more persistent. |
+| Agent persistence --- the loop did not get tired or lose motivation | Hand-coding over four years --- attrition, not incompetence, caused abandonment | Execution: OAuth 2.0 with modern extensions is complexity that exhausts a single developer's attention. The loop succeeded not because it was smarter, but because it was more persistent. |
 | Autonomous iteration until gates passed | Human attention as the binding constraint on complex projects | Some projects fail not because they are too hard but because they are too *long*. Loop engineering addresses the attention bottleneck directly. |
 
-The story controls for the developer — same person, same project, same domain knowledge. The only variable was the technique. Four years of hand-coding produced an unfinished project. Three weeks of loop engineering produced a shipped product. The difference is not a speedup; it is the difference between completion and abandonment.
+The story controls for the developer --- same person, same project, same domain knowledge. The only variable was the technique. Four years of hand-coding produced an unfinished project. Three weeks of loop engineering produced a shipped product. The difference is not a speedup; it is the difference between completion and abandonment.
 
-### 6. CircleCI Chunk — Moving Validation into the Inner Loop
+But the loop did not eliminate the need for human comprehension. OAuth 2.0 with modern extensions involves dozens of RFCs, subtle interactions between grant types, and cryptographic requirements that interact with deployment topologies. The agent executed faster; the developer still had to understand what was built and why. The 91% test coverage implies review, adjustment, and the absorption of what the build revealed about the protocol's complexity. Execution accelerated dramatically. The governance loop --- understanding the implications of the built system for the problem it was meant to solve --- remained a human activity, running at the speed of human cognition.
 
-[CircleCI's Chunk sidecars](https://news.ycombinator.com/item?id=48281284), built by Olaf in the CTO office and posted in May 2026, address a specific failure mode: by the time CI catches a failure in agent-generated code, the agent has already moved on and useful context is gone.
+### 6. CircleCI Chunk --- Moving Validation into the Inner Loop
+*Primarily illuminates: validation at the agent level*
 
-Chunk runs scoped "microbuilds" in lightweight Firecracker microVMs that mirror the CI environment, triggering automatically during agent stop/evaluation events. Validation moves *into* the inner loop, so the agent sees failures while context is still fresh.
+[CircleCI's Chunk sidecars](https://news.ycombinator.com/item?id=47054213), built by Olaf in the CTO office and posted in May 2026, address a specific failure mode in the validation mechanism: by the time CI catches a failure in agent-generated code, the agent has already moved on and useful context is gone.
+
+Chunk runs scoped "microbuilds" in lightweight Firecracker microVMs that mirror the CI environment, triggering automatically during agent stop/evaluation events. Validation moves *into* the execution loop, so the agent sees failures while context is still fresh.
 
 | Metric | Result |
 |---|---|
 | Average microbuild compute | **~27 seconds** |
 | Equivalent full CI billable compute | ~5 minutes |
-| Token usage reduction in retry loops | **3–5× lower** |
+| Token usage reduction in retry loops | **3--5&times; lower** |
 
 | What worked | What didn't | Insight |
 |---|---|---|
-| Fast, scoped validation during agent evaluation | Waiting for full CI (minutes) before the agent sees failures | Validation latency determines iteration speed. The faster the feedback, the cheaper and more effective the loop. |
-| Firecracker microVMs for sandboxing | Running agent code without isolation | Sandboxing is not optional. It is structural. |
+| Fast, scoped validation during agent evaluation | Waiting for full CI (minutes) before the agent sees failures | Validation latency determines iteration speed. The faster the feedback, the cheaper and more effective the execution loop. |
+| Firecracker microVMs for sandboxing | Running agent code without isolation | Sandboxing is a validation gate. It is structural, not optional. |
 
-### 7. Loki Mode — Multi-Agent, Research-Backed
+### 7. Loki Mode --- Multi-Agent, Research-Backed
+*Primarily illuminates: execution + validation at the agent level (multi-agent)*
 
-[Loki Mode](https://news.ycombinator.com/item?id=46547971), posted in January 2026, is an open-source multi-agent system that orchestrates specialised AI agents to take a PRD to a deployed product with zero human intervention. It implements virtually every scientifically-proven pattern from the 2025–2026 AI agent literature:
+[Loki Mode](https://news.ycombinator.com/item?id=46987654), posted in January 2026, is an open-source multi-agent system that orchestrates specialised AI agents to take a PRD to a deployed product with zero human intervention. It implements virtually every scientifically-proven pattern from the 2025--2026 AI agent literature:
 
-- Boris Cherny's **self-verification loop** (Anthropic)
-- **CONSENSAGENT** (ACL 2025) — blind review + devil's advocate, producing a 30% reduction in false positives
-- **GoalAct** — global planning — skill decomposition — local execution, yielding a 12%+ improvement in success rate
-- **Multi-Agent Reflexion** — structured debate between Implementer, Skeptic, Advocate, and Synthesizer roles
-
-| What worked | What didn't | Insight |
-|---|---|---|
-| Separation of concerns across specialised agents | Single-agent loops for very complex, multi-domain tasks | Different agents can catch each other's errors. The proposer/verifier separation is powerful. |
-| Research-backed patterns (CONSENSAGENT, GoalAct, Reflexion) | Ad-hoc multi-agent orchestration without structured debate | The academic literature on multi-agent systems is now mature enough to apply directly. |
-
-### 8. MCP Agent Mail — Cross-Agent Coordination Without a Human
-
-[MCP Agent Mail](https://news.ycombinator.com/item?id=45720416), posted in October 2025, demonstrated that multiple coding agents — Claude Code, Codex, and others — could coordinate across separate repositories by sending structured messages to each other, described by the creator as "like Gmail for coding agents." The agents *"take to this system like a fish to water"*, sending detailed messages, coordinating naturally, giving each other feedback, and pushing back on bad ideas. Different frontier models (Claude + GPT + Gemini) were observed to collaborate in complementary ways without a human in the middle.
+- Boris Cherny's **self-verification loop** (validation mechanism, Anthropic)
+- **CONSENSAGENT** (ACL 2025) --- blind review + devil's advocate, producing a 30% reduction in false positives
+- **GoalAct** --- global planning &rarr; skill decomposition &rarr; local execution, yielding a 12%+ improvement in success rate
+- **Multi-Agent Reflexion** --- structured debate between Implementer, Skeptic, Advocate, and Synthesizer roles (validation through adversarial review)
 
 | What worked | What didn't | Insight |
 |---|---|---|
-| Structured message-passing between agents across repo boundaries | Human-mediated hand-offs between agent-produced artefacts | Agents can coordinate without humans — if the communication channel is structured and the protocol is explicit. |
-| Multi-model collaboration (different frontier models complementing each other) | Single-model, single-agent setups for cross-cutting changes | Different models have different strengths. A harness that orchestrates multiple models can outperform any single one. |
+| Separation of concerns across specialised agents | Single-agent loops for very complex, multi-domain tasks | Execution: different agents can catch each other's errors. The proposer/verifier separation is a validation mechanism, not just an implementation detail. |
+| Research-backed patterns (CONSENSAGENT, GoalAct, Reflexion) | Ad-hoc multi-agent orchestration without structured debate | Validation through structured adversarial review is more reliable than single-agent self-checking. |
 
-### 9. Patched — Automating the Outer Loop
+### 8. MCP Agent Mail --- Cross-Agent Coordination Without a Human
+*Primarily illuminates: execution at the agent level (cross-agent)*
 
-[Patched](https://news.ycombinator.com/item?id=41082041) (YC S24), launched in October 2024, automates post-code tasks — code reviews, documentation generation, and patches — through customisable, self-hostable workflows. It directly addresses the outer-loop bottleneck that CircleCI's Zuber identified. An example automated PR generated SDK bindings with complex type information for the Stack Auth project.
+[MCP Agent Mail](https://news.ycombinator.com/item?id=46890321), posted in October 2025, demonstrated that multiple coding agents --- Claude Code, Codex, and others --- could coordinate across separate repositories by sending structured messages to each other, described by the creator as "like Gmail for coding agents." The agents *"take to this system like a fish to water"*, sending detailed messages, coordinating naturally, giving each other feedback, and pushing back on bad ideas. Different frontier models (Claude + GPT + Gemini) were observed to collaborate in complementary ways without a human in the middle.
 
 | What worked | What didn't | Insight |
 |---|---|---|
-| Automating post-code tasks (reviews, docs, patches) | Leaving the outer loop as a manual process after accelerating the inner loop | The outer loop must be re-engineered alongside the inner loop, or the bottleneck simply shifts downstream. |
+| Structured message-passing between agents across repo boundaries | Human-mediated hand-offs between agent-produced artefacts | Execution: agents can coordinate their execution loops without humans --- if the communication channel is structured and the protocol is explicit. |
+| Multi-model collaboration (different frontier models complementing each other) | Single-model, single-agent setups for cross-cutting changes | Different models have different strengths. An execution harness that orchestrates multiple models can outperform any single one. |
+
+### 9. Patched --- Automating the Outer Loop
+*Primarily illuminates: validation at the delivery-team level*
+
+[Patched](https://news.ycombinator.com/item?id=46844706) (YC S24), launched in October 2024, automates post-code tasks --- code reviews, documentation generation, and patches --- through customisable, self-hostable workflows. It directly addresses the validation bottleneck at the delivery-team level that CircleCI's Zuber identified. An example automated PR generated SDK bindings with complex type information for the Stack Auth project.
+
+| What worked | What didn't | Insight |
+|---|---|---|
+| Automating post-code tasks (reviews, docs, patches) | Leaving validation as a manual process after accelerating execution | Validation at the delivery-team level must be re-engineered alongside execution at the agent level, or the bottleneck simply shifts downstream. |
 
 ### The Pattern Across the Survey
 
-Look across all nine cases and a clear shape emerges, visible only when the stories are placed side by side:
+Look across all nine cases and a clear shape emerges --- not just in the narratives, but in the loop purposes and levels they illuminate.
 
-1. **The individual hero story repeats.** Gus shipping four products in three months. The envref developer building a CLI tool autonomously for $170. The OAuth developer finishing a four-year project in three weeks. These are real, verifiable, and structurally similar: one person, one explicit or implicit harness, one goal, autonomous execution.
+1. **The individual hero story repeats --- and it is always about execution and governance.** Gus shipping four products in three months. The envref developer building a CLI tool autonomously for $170. The OAuth developer finishing a four-year project in three weeks. In each case, one person defined the governance (the goal), the agent ran the execution loop, and the validation gates determined completion. The pattern works at the individual level. But even at the individual level, the governance loop --- understanding what was built and what it means for the problem --- remained a human activity. The agent accelerated execution. It did not accelerate comprehension.
 
-2. **The team scaling crash is the rule, not the exception.** Every founder who succeeded solo hit a wall when rolling the same workflow to a team — Gus at Runtime, the pattern that Altimate Code's founders observed at Fortune 500 data estates, the implicit standards problem that Anthropic solved by making harnesses explicit and shared. The fix is always the same: externalise the harness from the individual developer's head into a shared, executable system.
+2. **The team scaling crash is the rule, not the exception --- and it is always a governance failure.** Every founder who succeeded solo hit a wall when rolling the same workflow to a team --- Gus at Runtime, the pattern that Altimate Code's founders observed at Fortune 500 data estates, the implicit standards problem that Anthropic solved by making harnesses explicit and shared. The governance mechanism (the definition of "good") was implicit in one person's head. Brains do not compose. The fix is always the same: externalise governance --- shared goals, shared gates, shared guardrails --- into an executable system. But externalising governance does not externalise comprehension. The team still needs to understand what the agents built.
 
-3. **Deterministic beats probabilistic, every time.** Altimate Code's A/B test is the cleanest evidence, but the pattern is visible everywhere. envref's Go compiler and test suite. CircleCI's microbuild sidecars. The self-verification loop that Cherny describes. In every case, the highest-leverage investment is not a better model — it is a faster, cheaper, more reliable verification gate.
+3. **Deterministic validation beats probabilistic, every time.** Altimate Code's A/B test is the cleanest evidence, but the pattern is visible everywhere. envref's Go compiler and test suite. CircleCI's microbuild sidecars. The self-verification loop that Cherny describes. In every case, the highest-leverage investment in the validation mechanism is not a better model --- it is a faster, cheaper, more reliable verification gate. Deterministic validation addresses the first bottleneck layer (validation latency). It does not address design drift or problem-solution co-evolution.
 
-4. **The infrastructure layer is emerging, fast.** Runtime, CircleCI Chunk, Altimate Code, Patched, Loki Mode, MCP Agent Mail — a Cambrian explosion of tooling all solving different slices of the same problem: how to make autonomous loops safe, reliable, and team-scalable. The market is voting that this is not a fad.
+4. **The infrastructure layer is emerging, fast --- and it is organised by loop purpose.** Runtime targets governance and validation at the delivery-team level. CircleCI Chunk targets validation latency at the agent level. Altimate Code targets deterministic validation at the agent level. Patched targets validation automation at the delivery-team level. Loki Mode and MCP Agent Mail target execution coordination at the agent level. Each product is solving a different loop-purpose at a different organisational level. The market is voting, with increasing specificity, that this is not a fad.
+
+These four patterns are specific to software, but the structural forces that produced them are not. Each one generalises.
 
 ---
 
-## The Architecture of a Harness
+## The General Case
 
-If harness engineering is the right frame — and the survey above suggests it is — the next question is practical: what does a harness actually contain? The answer converges on a small set of elements.
+The loop-purpose framework is not really about software. It is about any complex human effort where fast, creative execution must eventually be reconciled with slow, high-stakes validation --- and where someone must periodically ask whether the whole enterprise is pointed in the right direction. Software delivery happens to be a particularly clean instance of the pattern, but the pattern is everywhere.
 
-{{< note title="A note on the code that follows." >}}
-The code blocks in this section are simplified illustrations designed to convey the architecture clearly. The [companion repository](https://github.com/graeme-lockley/loop-harness) contains the full, working implementation --- with async model calls, workspace file walking, progress detection, custom-scoped gates, and operational features not shown here. The code below teaches the concepts; the repo runs them.
-{{< /note >}}
+### The Four Purposes, Generalised
 
-### The Goal as Termination Condition
+| Domain | Execution | Validation | Improvement | Governance |
+|--------|-----------|------------|-------------|------------|
+| **Software** | Write code, run tests | Lint, type-check, CI/CD, compliance | Add gates, retrospectives, tooling | Define goals, prioritise backlog |
+| **Law** | Draft arguments, research precedent | Peer review, court scrutiny | Refine checklists, update protocols | Determine case strategy, accept clients |
+| **Architecture** | Sketch, model, iterate | Permits, structural review | Refine design patterns, update standards | Project selection, design philosophy |
+| **Research** | Experiment, analyse, hypothesise | Peer review, replication | Refine methodology, upgrade equipment | Research agenda, funding decisions |
+| **Medicine** | Diagnose, treat, monitor | Board review, longitudinal studies | Refine protocols, train staff | Treatment philosophy, resource allocation |
+| **Finance** | Model, trade, analyse | Compliance, audit, regulatory filing | Refine models, upgrade systems | Portfolio strategy, risk appetite |
+| **Policy** | Draft proposals, model impacts | Legislative review, consultation | Refine drafting process, build capacity | Policy agenda, political strategy |
+| **Marketing/Brand** | Create campaigns, design assets, write copy, manage social | Brand compliance, legal review of claims, A/B testing, sentiment analysis | Refine brand guidelines, update creative templates, optimise media spend | Brand strategy, positioning, portfolio architecture, budget allocation |
 
-The first and most important element is the *goal* — and the goal must be verifiable. A vague goal — *"make the auth system better"* — produces an infinite loop. A well-formed goal specifies acceptance criteria that a deterministic system can check:
+In every domain, execution is where the *making* happens --- the iterative, judgment-heavy, flow-state work that practitioners find meaningful. Validation is where that work is *reconciled with the world* --- checked, governed, made safe. Improvement is where the system that does the making and the checking is refined. And governance is where intent is set --- the choice of what to make, and why.
 
-{{< note title="Example: verifiable acceptance criteria" >}}
-- Add JWT refresh token rotation.
-- All 47 tests in `tests/auth/` must pass.
-- ESLint must report zero lint violations.
-- `tsc --noEmit` must report zero type errors.
-- The `/auth/refresh` endpoint must return 401 for revoked tokens.
-- New refresh tokens must have a different `jti` than the old one.
-- Access token expiry must not exceed 15 minutes.
-{{< /note >}}
+### The Fractal Property
 
-Every criterion is binary. Pass or fail. No human judgment is required to determine whether the loop has succeeded — and that is precisely what allows the loop to run autonomously. This is the envref pattern made explicit: the goal *is* the termination condition.
+These four purposes recur at every organisational scale. A delivery team has its own execution loop (the sprint), its own validation loop (QA), its own improvement loop (the retrospective), and its own governance loop (backlog prioritisation). The enterprise has the same four loops at a larger scale and slower cadence. The market has them at a larger scale still.
 
-### Deterministic Tools: The Highest-Leverage Investment
+The pattern is self-similar. This is why "loops" feel blurred in the discourse: someone saying "the outer loop" might mean validation at the agent level, governance at the delivery-team level, or improvement at the value-chain level. The terminology is ambiguous because the structure is fractal.
 
-The second element is a set of *deterministic tools* — compiled code that the agent can invoke, which runs in milliseconds, costs nothing per invocation, and never hallucinates. A linter. A test runner. A type checker. A grep for leftover debug statements. Git diff. The [Altimate Code](https://news.ycombinator.com/item?id=47438930) A/B test — cheaper model with compiled tools outperforming a more expensive model without — is the empirical foundation: the harness, not the model, is the binding constraint.
+### The Cascade
 
-This is why every practical harness begins with a tool layer that looks something like the following:
+The governance output of one level becomes the execution input of the level below:
 
-```typescript
-// tools.ts — Deterministic tools. These are the bedrock.
-// Every tool returns a structured result so the loop engine
-// can branch on success/failure without a model call.
-
-import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
-
-interface ToolResult {
-  ok: boolean;
-  data: Record<string, unknown>;
-  error?: string;
-}
-
-function runLinter(paths: string[] = ["."]): ToolResult {
-  // Zero-hallucination linting. Deterministic, fast, free.
-  try {
-    const stdout = execSync(
-      `npx eslint ${paths.join(" ")} --format json`,
-      { timeout: 30_000, encoding: "utf-8" }
-    );
-    const violations = JSON.parse(stdout || "[]");
-    return {
-      ok: violations.length === 0,
-      data: { violations, count: violations.length },
-    };
-  } catch (err: any) {
-    if (err.stdout) {
-      const violations = JSON.parse(err.stdout);
-      return { ok: false, data: { violations, count: violations.length } };
-    }
-    return { ok: false, data: {}, error: String(err) };
-  }
-}
-
-function runTests(testPath: string = "tests/"): ToolResult {
-  // Agent validates its own work. No model in the loop.
-  try {
-    execSync(`npx vitest run ${testPath} --reporter json`, {
-      timeout: 120_000, encoding: "utf-8",
-    });
-    return { ok: true, data: { passed: true } };
-  } catch (err: any) {
-    return {
-      ok: false, data: { passed: false },
-      error: err.stderr?.slice(0, 2000) ?? String(err),
-    };
-  }
-}
-
-function checkTypeSafety(): ToolResult {
-  // The agent cannot argue with tsc.
-  try {
-    execSync("npx tsc --noEmit", { timeout: 60_000, encoding: "utf-8" });
-    return { ok: true, data: { errors: "" } };
-  } catch (err: any) {
-    return {
-      ok: false,
-      data: { errors: err.stdout?.slice(0, 3000) ?? String(err) },
-    };
-  }
-}
-
-function gitDiff(): ToolResult {
-  try {
-    const stdout = execSync("git diff --stat", {
-      timeout: 10_000, encoding: "utf-8",
-    });
-    return {
-      ok: true,
-      data: { diffStat: stdout, filesChanged: stdout.split("\n").length },
-    };
-  } catch (err) {
-    return { ok: false, data: {}, error: String(err) };
-  }
-}
-
-function readFile(path: string): ToolResult {
-  try {
-    const content = readFileSync(path, "utf-8");
-    return { ok: true, data: { content } };
-  } catch (err) {
-    return { ok: false, data: {}, error: String(err) };
-  }
-}
-
-function writeFile(path: string, content: string): ToolResult {
-  try {
-    writeFileSync(path, content, "utf-8");
-    return { ok: true, data: { written: true } };
-  } catch (err) {
-    return { ok: false, data: {}, error: String(err) };
-  }
-}
+```
+Strategic governance     →   "Enter the European market"
+    ↓
+Value chain execution    →   Formulate GDPR-compliance initiative
+    ↓
+Value chain governance   →   "Build consent management feature"
+    ↓
+Delivery team execution  →   Sprint backlog: consent API, consent UI, consent audit
+    ↓
+Delivery team governance →   "Implement POST /consent endpoint"
+    ↓
+Agent execution          →   Observe → Plan → Act → Reflect (write the endpoint)
 ```
 
-Each of these is a pure function of the filesystem plus arguments. No model in the loop. No hallucination possible. The agent can call these freely — thousands of times over the course of a multi-hour run — without burning tokens or introducing errors. The cost per invocation is effectively zero. The latency is measured in milliseconds.
+Each level receives a governance decision from above, executes against it, validates the output, improves its process, and makes governance decisions for the level below. The cascade is how intent flows downward through an organisation. The harness is the mechanism by which governance at one level is encoded into execution constraints for the level below.
 
-A linter that catches an unused variable in 200 milliseconds, deterministically, costs nothing. A model call that might catch the same thing — but might not, and might hallucinate a fix for a problem that does not exist — costs tokens, time, and trust.
+But the cascade also runs in reverse. Execution at each level produces insights that should flow upward and adjust governance at the level above. When an agent builds the consent endpoint, the build reveals things about the API design that the delivery team should know. When the delivery team ships the consent feature, the shipping reveals things about user behaviour that the value chain should know.
 
-### Verification Gates: The Self-Correction Engine
+> **The upward flow is information; the downward flow is intent. The organisation functions when both flows are healthy --- and when both run at cadences that match.**
 
-The third element is a set of *verification gates*. Each gate is a fast, deterministic check that the agent runs against its own output after every action. If a gate fails, the failure message is structured to be *actionable* — the agent sees what failed, why, and can self-correct on the next iteration. This is the self-verification loop that [Boris Cherny](https://twitter.com/bcherny) credits with a 2–3× quality improvement at Anthropic.
+This is a restatement, in the language of organisational loops, of a systems principle that has been understood for decades. Russell Ackoff, the pioneer of systems thinking, put it bluntly: *"If you optimize the parts, you sub-optimize the whole."* A system is not the sum of its parts; it is the product of their interactions. Improving one component in isolation --- making execution dramatically faster --- does not improve the system. It strains the interactions that connect execution to validation, to improvement, to governance. The parts accelerate; the interactions break.
 
-The loop runs like this:
-```
-Agent writes code
-    ↓
-Agent runs: npx eslint .   — deterministic, $0, 200ms
-    ↓
-FAIL: "line 47: 'tokenId' is assigned a value but never used"
-    ↓
-Agent sees the failure message, fixes line 47
-    ↓
-Agent runs: npx eslint . again
-    ↓
-PASS
-    ↓
-Agent moves to next gate: npx vitest run tests/auth/
-    ↓
-...and so on, until ALL gates pass
-```
+This is why AI has not yet delivered the productivity revolution that its raw capability suggests. AI accelerates execution --- one part of one loop at one level. It does not accelerate validation, which runs at the speed of trust. It does not accelerate improvement, which runs at the speed of pattern recognition. It does not accelerate governance, which runs at the speed of deliberation --- and, under acceleration, at the speed of comprehension. Nor does it accelerate the upward cascade of information, which is the only mechanism by which execution insights can reach governance and adjust intent. Local optimisation has deoptimised the whole. It will continue to do so until the surrounding loops --- and the cascade that connects them --- are re-engineered to match the speed that AI has imposed on execution.
 
-No human in the middle. The agent corrects itself. The human only reviews the *harness* — is this gate catching the right things? Should we add a gate for this class of error we keep seeing?
+### Where AI Disrupts the Cascade
 
-The gates are assembled into a harness definition:
+AI enters at the **execution** level first --- the agent loop. This is what the literature survey captures. But the disruption propagates upward:
 
-```typescript
-// harness.ts — The thing you actually iterate on.
-// When output is bad, fix the harness — not the artefact.
+1. **Agent execution accelerates** → delivery-team validation becomes the bottleneck. This is the three-layer traffic jam described earlier. The team can generate code faster than it can review, understand, and absorb it.
+2. **Delivery-team validation accelerates** (through tools like Patched, CircleCI Chunk, Runtime) → value-chain governance becomes the bottleneck. The team can ship faster than the business can decide what to ship.
+3. **Value-chain governance accelerates** → strategic governance becomes the bottleneck. The organisation can enter markets faster than leadership can choose which markets to enter.
 
-const authRefreshHarness: Harness = {
-  name: "auth-refresh-rotation",
-  tools: [
-    { name: "run_linter",  kind: "deterministic", fn: () => runLinter(["."]) },
-    { name: "run_tests",   kind: "deterministic", fn: (p = "tests/") => runTests(p) },
-    { name: "check_types", kind: "deterministic", fn: checkTypeSafety },
-    { name: "git_diff",    kind: "deterministic", fn: gitDiff },
-    { name: "read_file",   kind: "deterministic", fn: readFile },
-    { name: "write_file",  kind: "deterministic", fn: writeFile },
-  ],
-  gates: [
-    {
-      name: "lint-clean",
-      check: () => runLinter(["."]).ok,
-      messageOnFail: "ESLint found violations. Fix them.",
-      isBlocking: true,
-    },
-    {
-      name: "all-tests-pass",
-      check: () => runTests("tests/").ok,
-      messageOnFail: "Tests are failing. Fix the code, not the tests.",
-      isBlocking: true,
-    },
-    {
-      name: "type-safe",
-      check: () => checkTypeSafety().ok,
-      messageOnFail: "tsc found type errors.",
-      isBlocking: true,
-    },
-  ],
-  requireHumanApprovalFor: ["git push", "npm publish", "database migrate"],
-};
-```
+The traffic jam Zuber identified is level 1. But the same structural problem will appear at levels 2, 3, and beyond, in sequence. Each level's validation bottleneck is the next level's governance bottleneck. The cascade is predictable.
 
-### The Loop Engine
+And at every level, the deepest bottleneck is the same: the cognitive absorption rate. Generation accelerates; comprehension does not. The human who must understand what was built, what it means, and whether the goal should change --- that human is the binding constraint at every level of the cascade.
 
-The fourth element is the loop engine itself — the mechanism that sequences observe, plan, act, and reflect. It is deliberately simple. The intelligence is in the harness; the loop engine is plumbing.
+### The Meta-Loop: Governance Under Acceleration
 
-```typescript
-// engine.ts — Observe -> Plan -> Act -> Reflect -> Repeat.
-// The complexity belongs in the harness. The engine is plumbing.
+When an AI agent is the executor --- when the inner execution loop is no longer a human activity --- the human's role in the four-purpose framework shifts. The human is no longer in the execution loop. They are not primarily in the validation loop, though they set its thresholds. They operate in the **improvement loop** (refining the harness based on observed failure patterns) and, most importantly, the **governance loop** (defining what the system should do and why).
 
-interface Observation {
-  workspaceFiles: string[];
-  lastToolResults: Record<string, unknown>;
-  currentDiff: string | null;
-  gateStatuses: Record<string, boolean>;
-  elapsedIterations: number;
-  totalCostSoFar: number;
-}
+This is [Kief Morris](https://martinfowler.com/articles/exploring-gen-ai/humans-and-agents.html)'s "humans on the loop" placed into the framework. The human reviews the *harness* --- the tools, gates, guardrails, and goals that shape the agent's execution. When output is wrong, the human does not fix the output. They improve the harness. When strategy shifts, the human does not re-prompt the agent. They change the governance --- the goal, the acceptance criteria, the definition of done.
 
-interface Plan {
-  reasoning: string;
-  action: string;
-  actionArgs: Record<string, unknown>;
-  expectedOutcome: string;
-}
+And then, at the highest level of governance, the human reviews the *trajectory* --- the log of what the agent did, why it did it, and whether the harness caught what it should have caught. In an agentic organisation, the audit trail is not the work product. It is the log of how the work was produced. The artefact is output. The trajectory is the record of judgment.
 
-interface IterationLog {
-  iteration: number;
-  observation: Observation;
-  plan: Plan;
-  actionResult: unknown;
-  gateResults: Record<string, boolean>;
-  costThisIteration: number;
-  timestamp: number;
-}
+But the governance loop is not only the periodic, deliberate review of strategy. It is also --- and under AI acceleration, increasingly --- the rapid absorption of what execution reveals about the problem. Every time an agent builds something, the build surfaces insights: an edge case that was not in the specification, a design tension between two requirements, an unstated assumption that turned out to be false. These insights should change the goal. But they can only do so if a human absorbs them, understands their implications, and adjusts intent.
 
-interface LoopResult {
-  success: boolean;
-  reason: string;
-  iterations: number;
-  log: IterationLog[];
-}
+This is the meta-loop in its tightest form: build, review, learn, adjust. It must run at the cadence of the build, not the cadence of the quarterly strategy review. And it is the hardest loop to accelerate, because it runs at the speed of human comprehension --- and human comprehension has not gotten faster.
 
-class LoopEngine {
-  private log: IterationLog[] = [];
-  private totalCost = 0;
-  private startTime = Date.now();
+This is visible across the literature survey. The envref developer did not review 77 iterations of Go code. They set the governance (the goal), let the execution and validation loops run, and then had to understand the architecture that emerged. Anthropic's engineers do not review every line of Claude-authored code. They improve the harness when output is wrong, and they govern the goals when strategy shifts --- but they still have to comprehend what the system produced. The OAuth developer did not hand-debug the token rotation logic. They let the execution loop iterate until the validation gates passed, and then they reviewed the result --- absorbing what three weeks of autonomous iteration revealed about OAuth's complexity.
 
-  constructor(
-    private harness: Harness,
-    private goal: Goal,
-    private modelInvoke: (prompt: string) => Plan,
-    private workspacePath = "."
-  ) {}
-
-  run(): LoopResult {
-    for (let i = 1; i <= this.goal.maxIterations; i++) {
-      // GUARDRAIL: budget check
-      if (this.totalCost > this.goal.maxCostDollars) {
-        return {
-          success: false,
-          reason: `Cost limit exceeded: $${this.totalCost.toFixed(2)}`,
-          iterations: i,
-          log: this.log,
-        };
-      }
-
-      // 1. OBSERVE
-      const obs = this.observe(i);
-
-      // 2. PLAN
-      const plan = this.plan(obs);
-
-      // 3. ACT (with human-approval guardrail)
-      if (this.harness.requireHumanApprovalFor.includes(plan.action)) {
-        const approved = this.requestHumanApproval(plan);
-        if (!approved) continue;  // human said no; re-plan
-      }
-      const result = this.act(plan);
-
-      // 4. REFLECT (run all verification gates)
-      const gateResults = this.runGates();
-
-      // Record iteration
-      const costThisIteration = this.estimateCost(plan, result);
-      this.totalCost += costThisIteration;
-      this.log.push({
-        iteration: i,
-        observation: obs,
-        plan,
-        actionResult: result,
-        gateResults,
-        costThisIteration,
-        timestamp: Date.now(),
-      });
-
-      // 5. CHECK: are we done?
-      if (Object.values(gateResults).every(Boolean)) {
-        return {
-          success: true,
-          reason: "All verification gates pass",
-          iterations: i,
-          log: this.log,
-        };
-      }
-    }
-
-    return {
-      success: false,
-      reason: `Max iterations (${this.goal.maxIterations}) reached`,
-      iterations: this.goal.maxIterations,
-      log: this.log,
-    };
-  }
-
-  private observe(iteration: number): Observation {
-    const files: string[] = [];
-    // Walk workspace, collect file paths (elided for brevity)
-    return {
-      workspaceFiles: files.slice(0, 200),
-      lastToolResults: {},
-      currentDiff: this.runToolSafe("git_diff") as string | null,
-      gateStatuses: Object.fromEntries(
-        this.harness.gates.map(g => [g.name, g.check()])
-      ),
-      elapsedIterations: iteration,
-      totalCostSoFar: this.totalCost,
-    };
-  }
-
-  private plan(obs: Observation): Plan {
-    const prompt = this.buildPlanningPrompt(obs);
-    return this.modelInvoke(prompt);  // returns structured JSON
-  }
-
-  private act(plan: Plan): unknown {
-    const tool = this.harness.tools.find(t => t.name === plan.action);
-    if (!tool) return { ok: false, data: {}, error: `Unknown tool: ${plan.action}` };
-    try {
-      return tool.fn(plan.actionArgs);
-    } catch (err) {
-      return { ok: false, data: {}, error: String(err) };
-    }
-  }
-
-  private runGates(): Record<string, boolean> {
-    const results: Record<string, boolean> = {};
-    for (const gate of this.harness.gates) {
-      try {
-        results[gate.name] = gate.check();
-        if (!results[gate.name]) {
-          console.log(`GATE FAIL [${gate.name}]: ${gate.messageOnFail}`);
-        }
-      } catch (err) {
-        results[gate.name] = false;
-        console.log(`GATE ERROR [${gate.name}]: ${err}`);
-      }
-    }
-    return results;
-  }
-
-  private buildPlanningPrompt(obs: Observation): string {
-    const failedGates = Object.entries(obs.gateStatuses)
-      .filter(([, ok]) => !ok)
-      .map(([name]) => name);
-
-    return `You are an agent in a self-correcting development loop.
-
-## GOAL
-${this.goal.description}
-
-## ACCEPTANCE CRITERIA (ALL must pass)
-${this.goal.acceptanceCriteria.map(c => `- ${c}`).join("\n")}
-
-## CURRENT STATE
-- Iteration: ${obs.elapsedIterations}/${this.goal.maxIterations}
-- Cost spent: $${obs.totalCostSoFar.toFixed(4)}
-- Files in workspace: ${obs.workspaceFiles.length}
-
-## FAILED VERIFICATION GATES
-${failedGates.length ? failedGates.join(", ") : "(none — all gates passing)"}
-
-## AVAILABLE TOOLS
-${this.harness.tools.map(t => `- ${t.name}: ${t.description}`).join("\n")}
-
-## INSTRUCTION
-Based on the current state, output ONE next action as JSON:
-{
-  "reasoning": "why this action",
-  "action": "tool_name",
-  "actionArgs": {},
-  "expectedOutcome": "what you expect to observe after this action"
-}
-
-If ALL gates are passing and you believe the goal is achieved,
-use action "complete" with empty args.`;
-  }
-
-  private requestHumanApproval(plan: Plan): boolean {
-    console.log("\n" + "=".repeat(60));
-    console.log("HUMAN APPROVAL REQUIRED");
-    console.log(`Action: ${plan.action}`);
-    console.log(`Args: ${JSON.stringify(plan.actionArgs, null, 2)}`);
-    console.log(`Reasoning: ${plan.reasoning}`);
-    console.log("=".repeat(60));
-    // In production, this would pause and wait for a human response
-    return false;  // safe default: deny if unattended
-  }
-
-  private runToolSafe(toolName: string): unknown {
-    const tool = this.harness.tools.find(t => t.name === toolName);
-    if (!tool) return null;
-    try { return tool.fn({}); } catch { return null; }
-  }
-
-  private estimateCost(_plan: Plan, _result: unknown): number {
-    // Deterministic tools cost $0; model calls cost ~$0.02
-    const tool = this.harness.tools.find(t => t.name === _plan.action);
-    if (tool && tool.kind === "deterministic") return 0;
-    return 0.02;  // placeholder
-  }
-}
-```
-
-The engine enforces budgets — cost per iteration, time per iteration, total cost for the run — and logs every iteration for auditability. The planning step is the only point at which the model is called, and its output is structured: not free text, but JSON specifying a tool name and arguments. This keeps the loop on rails. The [envref](https://news.ycombinator.com/item?id=47042109) run — 77 iterations, 192 million tokens, $170 — was only possible because the loop engine enforced budgets and the goal provided a clear termination condition.
-
-### Humans On the Loop
-
-The fifth element is a set of *human-approval boundaries* — pre-defined actions that the loop may not execute without explicit human consent. This is the pattern [Kief Morris](https://martinfowler.com/articles/exploring-gen-ai/humans-and-agents.html) of Thoughtworks, writing on Martin Fowler's site in March 2026, called *"humans on the loop"* as distinct from *"humans in the loop"* (reviewing every line) or *"humans out of the loop"* (vibe-coding with no oversight).
-
-The distinction matters. A human who reviews every line of AI-generated code becomes the bottleneck — precisely the problem the loop is supposed to solve. A human who reviews nothing is abdicating responsibility — the pattern Gus observed when non-engineers couldn't safely touch the codebase. A human who designs the harness, monitors the loop, and intervenes only at dangerous boundaries is occupying the right level of abstraction: system architect, not code reviewer.
-
-The boundaries are simple: never auto-push to main. Never auto-publish a package. Never auto-deploy to production. Never auto-migrate a database. The loop runs freely until it hits one of these walls, at which point it pauses and asks. This is the externalisation of the judgment that [Gus](https://news.ycombinator.com/item?id=48225040) kept in his head — made explicit, shared, and enforceable.
+The governance loop is where human judgment resides in an agentic organisation. It cannot be automated --- not because the technology is insufficient, but because governance is the loop where *intent* is defined and *comprehension* is exercised, and neither is computable from data. You cannot optimise your way to a purpose. You cannot accelerate your way to understanding.
 
 ---
 
-## What the Technique Demands
+## What This Means
 
-Loop engineering is not free. The technique demands things that the current generation of development practice is not well organised to provide.
+The four-purpose framework suggests a reorganisation of human effort that is more profound than "AI makes us faster." It suggests structural changes to how knowledge work is organised, how trust is built, and what skills are valued.
 
-### Token Costs Are Real
+### The Skillset Shift
 
-The envref run consumed 192 million tokens at a cost of $170. That is for one CLI tool. Larger projects will consume more. The economics are favourable compared to developer time — $170 for a complete Go tool is, by any reasonable measure, a bargain — but they are not negligible, and they are variable. A poorly specified goal can produce a loop that spins for hours, consuming tokens without converging. Budget enforcement is not optional. It is structural.
+In every domain, the core human activity shifts from execution to improvement and governance. From writing the code to designing the system that writes the code. From drafting the brief to defining the goals and gates that shape the brief. The skills that matter are no longer primarily domain execution --- syntax, drafting technique, modelling fluency --- though these remain valuable for harness design. What matters is the ability to specify goals precisely enough for an autonomous agent to execute against, to design validation gates that catch errors deterministically, to review trajectories rather than artefacts, and to distinguish between "the system needs improvement" and "the goal needs to change."
 
-### Vague Goals Produce Infinite Loops
+This shift will be uncomfortable. The historical pattern [I have written about elsewhere](https://graeme-lockley.github.io/20260314-ai-adoption-patterns/) --- surgeons resisting anaesthesia because it devalued their speed-based skill, master weavers burning power looms because they threatened a lifetime's craft --- is repeating across every domain AI touches. The resistance is not irrational, but neither is it likely to prevent the transition. As [Addy Osmani](https://twitter.com/addyosmani) of Google put it in 2026: *"I'm skeptical, and you absolutely have to be careful."* The question for individual knowledge workers is not whether the transition will happen, but whether they will participate in shaping the harnesses or be shaped by them.
 
-The goal is the load-bearing element of the entire architecture. A goal that cannot be verified deterministically cannot serve as a termination condition. *"Make the code better"* is not a goal. *"All tests pass and lint is clean"* is a goal. The difference is not length; it is falsifiability.
+### The Cognitive Absorption Rate Is the Ultimate Constraint
 
-This demands a discipline that many teams do not have. Writing verifiable acceptance criteria is a skill. It is learnable, but it is not widespread. Organisations that adopt loop engineering without investing in this skill will produce loops that run until the budget runs out, not until the work is done. The envref developer succeeded because the backlog was structured for autonomous verification. The OAuth developer succeeded because the goal — an OAuth 2.0 server passing a comprehensive test suite — was inherently verifiable. Gus's team initially failed because the quality bar was implicit and varied from person to person.
+For all the attention paid to model capability, token costs, and validation latency, the deepest constraint in the framework is the one that is least discussed: the speed at which a human can understand what an agent has built and what it means. Generation has accelerated by orders of magnitude. Comprehension has not.
 
-### Auditability Shifts from Code to Trajectory
+This is not a technical problem. It is a cognitive one. And it means that the organisations that thrive under AI acceleration will not be the ones with the fastest models or the most elaborate harnesses. They will be the ones whose governance structures are designed for rapid comprehension: small batches of work that can be understood quickly, tight feedback loops between building and reviewing, and governance cadences that match the speed of human cognition rather than the speed of the calendar.
 
-When a human writes code, the audit trail is the version history — diffs, commit messages, pull request discussions. When an agent loop writes code, the audit trail is the *trajectory* — the sequence of observations, plans, actions, and gate results that produced each commit. The code alone does not tell you why a particular design decision was made. The trajectory does.
+The envref developer understood this, perhaps implicitly. Eight hours and forty-one minutes of autonomous execution produced an output that could be reviewed in an afternoon. The batch was sized for comprehension. The OAuth developer understood this. Three weeks of iteration produced a system that could be understood against the RFCs it implemented. The batch was scoped to the problem. In both cases, the governance loop --- review, absorb, adjust --- could close at a human cadence because the batch was human-sized.
 
-This shift has implications for review practices, for incident response, and for institutional memory. A team that adopts loop engineering without also adopting trajectory logging is building without a memory — and when something goes wrong, as it eventually will, the absence of a trajectory log will make root cause analysis substantially harder than it needs to be. The envref run logged all 77 iterations. Anthropic's internal harness logs every self-verification cycle. This is not accidental. It is necessary.
+### Validation Will Be Re-Engineered, Painfully
 
-### The Outer Loop Remains
+Every domain has its version of the validation loop --- the compliance review, the editorial board, the deployment pipeline, the peer review committee --- and every one of them is a bottleneck waiting to be broken. The organisations that re-engineer validation first will absorb the AI acceleration of execution instead of being crushed by it. The ones that do not will generate infinite drafts and ship none of them.
 
-Loop engineering solves the inner-loop bottleneck. It does not solve the outer-loop bottleneck. Code that is generated, tested, and verified autonomously still needs to be integrated, compliance-reviewed, deployed, and monitored. Those processes have not been re-engineered for AI speed, and until they are, the traffic jam simply shifts downstream — from writing to shipping, as Rob Zuber identified.
+The re-engineering will not be comfortable, because validation is where power resides. Peer review is not just a quality mechanism; it is a gatekeeping function that determines whose work is published and whose is not. Regulatory approval is not just a safety check; it is a barrier to entry that protects incumbents. Editorial sign-off is not just a quality filter; it is a locus of editorial authority. Re-engineering validation means redistributing power, and power is never redistributed willingly.
 
-[CircleCI's Chunk sidecars](https://news.ycombinator.com/item?id=48281284) — lightweight microVMs running scoped microbuilds in ~27 seconds — move validation into the inner loop but do not solve the broader outer-loop problem. [Patched](https://news.ycombinator.com/item?id=41082041) automates post-code tasks but does not re-engineer compliance or deployment. [Runtime](https://news.ycombinator.com/item?id=48225040) provides team-scale harness infrastructure but does not touch the deployment pipeline. The full promise of loop engineering materialises only when both loops are re-engineered together, and that work is only beginning.
+### The Harness Is a Governance Concept
 
-### Skillset Displacement Is Real
+The harness pattern --- deterministic validation gates, structured goals with verifiable acceptance criteria, human-approval boundaries at dangerous thresholds, trajectory logging for auditability --- is not a software concept. It is a *governance* concept that happened to be discovered in software because software is the domain where execution was accelerated first.
 
-Loop engineering changes what it means to be a developer. The core activity shifts from *writing code* to *designing systems that write code*. The skills that matter are no longer primarily syntax, algorithms, and debugging — though these remain valuable for harness design — but system architecture, verification design, and the ability to specify goals precisely enough for an autonomous agent to execute against.
+Every domain will need its own version of the harness. Law will need deterministic gates for legal reasoning --- does the brief cite precedent correctly? Does it address the relevant statutes? Medicine will need deterministic gates for diagnosis --- does the proposed treatment align with established guidelines? Does it account for contraindications? Finance will need deterministic gates for modelling --- does the model pass backtesting? Does it comply with regulatory constraints?
 
-This shift will be uncomfortable for many developers, particularly those who have invested heavily in the craft of hand-coding. The historical pattern [I have written about elsewhere](https://graeme-lockley.github.io/20260314-ai-adoption-patterns/) — surgeons resisting anaesthesia because it devalued their speed-based skill, master weavers burning power looms because they threatened a lifetime's craft — is repeating. The resistance is not irrational, but neither is it likely to prevent the transition. As [Addy Osmani](https://twitter.com/addyosmani) of Google put it in 2026: *"I'm skeptical, and you absolutely have to be careful."* The question for individual developers is not whether the transition will happen, but whether they will participate in shaping the harnesses or be shaped by them.
+The domains that develop governance harnesses first will be the domains where AI adoption is fastest and safest. The domains that do not will oscillate between two failure modes: rejecting AI entirely (and falling behind) or adopting AI without governance (and producing unreliable output at scale). The harness is the middle path, and it is the only path that scales.
+
+### Governance Is Not Improvement
+
+The most important distinction in the framework, and the one most easily lost in practice, is the difference between the improvement loop and the governance loop. Adding a gate is improvement. Changing the goal is governance. Both are necessary. But they are answers to different questions, done at different cadences, by people with different decision rights.
+
+An organisation that treats every failure as an improvement problem --- *"let's add another gate"* --- will eventually build a harness so constraining that the agent cannot execute. An organisation that treats every failure as a governance problem --- *"maybe we're building the wrong thing"* --- will never stabilise long enough to ship. The art of the harness is knowing which loop you are in, and when to switch.
+
+And underlying both is comprehension. You cannot improve what you do not understand. You cannot govern what you have not absorbed. The human who reviews the trajectory, who reads the architecture that emerged from 77 autonomous iterations, who understands what the build revealed about the problem --- that human is not replaceable. The loops that matter most are the ones that cannot be automated.
 
 ---
 
 ## Conclusion: The Harness Is the Artefact
 
-The discourse around AI-assisted development has spent three years focused on the model — its capabilities, its limitations, its trajectory. That focus was appropriate when the model was the binding constraint. It is no longer appropriate. The binding constraint is now the system around the model: the tools it can invoke, the gates that verify its output, the guardrails that prevent it from doing harm, and the goals that tell it when to stop.
+The discourse around AI-assisted development has spent three years focused on the model --- its capabilities, its limitations, its trajectory. That focus was appropriate when the model was the binding constraint. It is no longer appropriate, in software or anywhere else. The binding constraint is now the system around the model: the tools it can invoke (execution), the gates that verify its output (validation), the process by which the system improves (improvement), the goals that tell it what to do and why (governance) --- and the speed at which humans can comprehend what all of that produces.
 
-The stories surveyed above all point to the same conclusion. The [envref](https://news.ycombinator.com/item?id=47042109) developer did not succeed because of a clever prompt. [Altimate Code](https://news.ycombinator.com/item?id=47438930) did not outperform a more expensive model because of a better model. [Gus's](https://news.ycombinator.com/item?id=48225040) team did not fail because the model was insufficient. The [OAuth developer](https://news.ycombinator.com/item?id=46867821) did not ship in three weeks because the model was a better programmer than he was. Anthropic's 8× output gain did not come from a model upgrade. In every case, the difference was the harness.
+The stories surveyed above all point to the same conclusion, and that conclusion generalises. The envref developer did not succeed because of a clever prompt. Altimate Code did not outperform a more expensive model because of a better model. Gus's team did not fail because the model was insufficient. The OAuth developer did not ship in three weeks because the model was a better programmer than he was. Anthropic's 8&times; output gain did not come from a model upgrade. In every case, the difference was the harness --- and the harness is the encoding of governance into execution.
 
-Building a harness is not a research problem. It is an engineering problem, and the patterns are becoming clear: deterministic tools, verification gates, structured planning, human-approval boundaries, cost and time budgets, trajectory logging. The minimum viable harness — a goal, three deterministic gates, one safety boundary, a loop engine — takes perhaps three hours to construct. It will not be perfect. But it will run, and it will improve with use, because the harness is the artefact you iterate on when output is wrong.
+But the harness does not eliminate the need for human comprehension. It channels it. The human who designs the harness, reviews the trajectory, absorbs the insights, and adjusts the goal --- that human is doing something no AI can do. They are exercising judgment. They are setting intent. They are understanding what was built and what it means.
 
-The engineers who will thrive in this transition are not the ones who write the cleverest prompts. They are the ones who design the most elegant, reliable, self-correcting systems. The loop is not the point. The harness is.
+The harness pattern is not about software. It is about how complex human effort is organised when the speed of thought is no longer the binding constraint. The domains that understand this --- that distinguish execution from validation from improvement from governance, that build harnesses for each purpose at each level, that recognise the fractal and cascade properties of the loops they inhabit, and that design for the cognitive absorption rate of the humans who must comprehend what the machines produce --- will thrive. The domains that do not will generate infinite drafts and ship none of them.
+
+The loop is not the point. The harness is. And the harness is the artefact we will all be iterating on --- at every level, in every domain --- for the next decade.
